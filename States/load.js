@@ -10,6 +10,11 @@ Game.Load.prototype = {
         game.load.image('title_background', 'Assets/Title/background.png');
         game.load.image('title_logo', 'Assets/Title/title.png');
         game.load.image('title_play', 'Assets/Title/play button.png');
+        game.load.image('title_tutorial', 'Assets/Title/tutorial button.png');
+
+        // Tutorial
+        game.load.image('tutorial', 'Assets/Tutorial/TUTORIAL.png');
+        game.load.image('tutorial_continue', 'Assets/Tutorial/continue.png');
 
         // Level Select
         game.load.image('level_background', 'Assets/Level Select/background.png');
