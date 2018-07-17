@@ -13,9 +13,18 @@ Game.Title.prototype = {
         playButton.anchor.set(0.5);
         playButton.inputEnabled = true;
         playButton.events.onInputDown.addOnce(this.start);
+
+        var tutorialButton = game.add.image(660, 135, 'title_tutorial');
+        tutorialButton.anchor.set(0.5);
+        tutorialButton.inputEnabled = true;
+        tutorialButton.events.onInputDown.addOnce(this.tutorial);
     },
 
     start: function() {
         game.state.start('levelSelect');
+    },
+
+    tutorial: function() {
+        game.state.start('tutorial');
     }
 }
