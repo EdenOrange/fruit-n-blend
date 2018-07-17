@@ -4,19 +4,18 @@ Game.Title = function(game) {
 
 Game.Title.prototype = {
     create: function() {
-        game.stage.backgroundColor = '#ff6622';
+        var background = game.add.image(0, 0, 'title_background');
 
-        var nameLabel = game.add.text(80, 80, 'Disillusion', {font: '50px Arial', fill: '#ffffff'});
-        var startLabel = game.add.text(80, game.world.height - 80, 'Press the "W" key to start', {font: '25px Arial', fill: '#ffffff'});
+        var logo = game.add.image(game.world.width / 2, 225, 'title_logo');
+        logo.anchor.set(0.5);
 
-        var wKey = game.input.keyboard.addKey(Phaser.Keyboard.W);
-        var eKey = game.input.keyboard.addKey(Phaser.Keyboard.E);
-
-        wKey.onDown.addOnce(function(wKey){this.start(1)}, this);
-        eKey.onDown.addOnce(function(eKey){this.start(2)}, this);
+        var playButton = game.add.image(game.world.width / 2, 450, 'title_play');
+        playButton.anchor.set(0.5);
+        playButton.inputEnabled = true;
+        playButton.events.onInputDown.addOnce(this.start);
     },
 
-    start: function(level) {
-        game.state.start('game', true, false, level);
+    start: function() {
+        game.state.start('levelSelect');
     }
 }
