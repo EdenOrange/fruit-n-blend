@@ -25,6 +25,6 @@ Game.Game.prototype = {
     },
 
     menu: function() {
-        game.state.start('menu');
+        game.state.start('title');
     }
 }

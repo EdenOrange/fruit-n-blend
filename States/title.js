@@ -1,8 +1,8 @@
-Game.Menu = function(game) {
+Game.Title = function(game) {
 
 }
 
-Game.Menu.prototype = {
+Game.Title.prototype = {
     create: function() {
         game.stage.backgroundColor = '#ff6622';
 
