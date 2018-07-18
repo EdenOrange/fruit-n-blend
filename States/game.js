@@ -4,8 +4,9 @@ Game.Game = function(game) {
 
 // Current level
 var level;
-// Game UI group
+// UI groups
 var gameUI;
+var pauseMenu;
 // Input enabled Game UI array
 var gameInputEnabledUI;
 
@@ -15,6 +16,11 @@ Game.Game.prototype = {
     },
 
     create: function() {
+        this.createGameUI();
+        this.createPauseMenu();
+    },
+
+    createGameUI: function() {
         gameUI = game.add.group();
         gameInputEnabledUI = [];
 
@@ -39,9 +45,32 @@ Game.Game.prototype = {
         
         gameUI.addMultiple([background, blender, fruitBasket, juice, time, pauseButton]);
         gameInputEnabledUI.push(pauseButton);
+    },
 
-        var rKey = game.input.keyboard.addKey(Phaser.Keyboard.R);
-        rKey.onDown.add(this.unpause, this);
+    createPauseMenu: function() {
+        pauseMenu = game.add.group();
+        
+        var background = game.add.image(game.world.width / 2, 600, 'pause_background');
+        var resumeButton = game.add.image(game.world.width / 2, 520, 'pause_resume');
+        var restartButton = game.add.image(game.world.width / 2, 640, 'pause_restart');
+        var quitButton = game.add.image(game.world.width / 2, 760, 'pause_quit');
+
+        background.anchor.set(0.5);
+
+        resumeButton.anchor.set(0.5);
+        resumeButton.inputEnabled = true;
+        resumeButton.events.onInputDown.add(this.resume, this);
+
+        restartButton.anchor.set(0.5);
+        restartButton.inputEnabled = true;
+        restartButton.events.onInputDown.add(this.restart, this);
+        
+        quitButton.anchor.set(0.5);
+        quitButton.inputEnabled = true;
+        quitButton.events.onInputDown.add(this.quit, this);
+
+        pauseMenu.addMultiple([background, resumeButton, restartButton, quitButton]);
+        pauseMenu.visible = false;
     },
 
     pause: function() {
@@ -55,9 +84,12 @@ Game.Game.prototype = {
         gameInputEnabledUI.forEach(function (object) {
             object.inputEnabled = false;
         });
+
+        // Show Pause Menu
+        pauseMenu.visible = true;
     },
 
-    unpause: function() {
+    resume: function() {
         // Remove gray filter from Game UI
         gameUI.filters = null;
         // Lighten back up Game UI
@@ -67,5 +99,16 @@ Game.Game.prototype = {
         gameInputEnabledUI.forEach(function (object) {
             object.inputEnabled = true;
         });
+
+        // Hide Pause Menu
+        pauseMenu.visible = false;
+    },
+
+    restart: function() {
+        console.log('Restart');
+    },
+
+    quit: function() {
+        game.state.start('title');
     }
 }
