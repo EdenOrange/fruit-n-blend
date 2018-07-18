@@ -4,6 +4,24 @@ Game.Game = function(game) {
 
 // Current level
 var level;
+
+// Board settings
+var board = {
+    size: 4,        // Board maximum size
+    start: {
+        x: 270,     // Board starting x-coordinate
+        y: 850      // Board starting y-coordinate
+    },
+    margin: {
+        x: 105,     // Board piece margin x-axis
+        y: 105,     // Board piece margin y-axis
+    },
+    ask: {
+        x: 100,     // Asking piece x-coordinate
+        y: 810      // Asking piece y-coordinate
+    }
+}
+
 // UI groups
 var gameUI;
 var pauseMenu;
@@ -18,6 +36,7 @@ Game.Game.prototype = {
     create: function() {
         this.createGameUI();
         this.createPauseMenu();
+        this.createNewGame();
     },
 
     createGameUI: function() {
@@ -73,6 +92,38 @@ Game.Game.prototype = {
         pauseMenu.visible = false;
     },
 
+    createNewGame: function() {
+        this.createBoard();
+        this.createAsk();
+    },
+
+    createBoard: function() {
+        // Create a new board
+        for (var i = 0; i < board.size * board.size; i++) {
+            var boardX = board.start.x + board.margin.x * (i % board.size);
+            var boardY = board.start.y + board.margin.y * Math.floor(i / board.size);
+            var piece;
+            if ((i + Math.floor(i / board.size)) % 2 == 0) {
+                piece = game.add.image(boardX, boardY, 'puzzle_empty_h');
+            }
+            else {
+                piece = game.add.image(boardX, boardY, 'puzzle_grape_orange_v');
+            }
+            piece.anchor.set(0.5);
+            piece.scale.set(1.3);
+
+            gameUI.add(piece);
+        }
+    },
+
+    createAsk: function() {
+        var ask = game.add.image(board.ask.x, board.ask.y, 'puzzle_apple_purple_h_drop');
+        ask.anchor.set(0.5);
+        ask.scale.set(1.3);
+
+        gameUI.add(ask);
+    },
+
     pause: function() {
         // Add gray filter to Game UI
         var grayFilter = game.add.filter('Gray');
@@ -87,6 +138,7 @@ Game.Game.prototype = {
 
         // Show Pause Menu
         pauseMenu.visible = true;
+        game.world.bringToTop(pauseMenu);
     },
 
     resume: function() {
@@ -105,7 +157,7 @@ Game.Game.prototype = {
     },
 
     restart: function() {
-        console.log('Restart');
+        this.createNewGame();
     },
 
     quit: function() {
