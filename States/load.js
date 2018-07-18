@@ -88,6 +88,9 @@ Game.Load.prototype = {
         game.load.image('result_level', 'Assets/Game/Result/level.png');
         game.load.image('result_continue', 'Assets/Game/Result/continue.png');
         game.load.image('result_restart', 'Assets/Game/Result/restart.png');
+
+        // Filters
+        game.load.script('filter_gray', 'Assets/Filters/gray.js');
     },
 
     create: function() {
