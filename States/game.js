@@ -160,11 +160,11 @@ Game.Game.prototype = {
             var boardY = board.settings[1].start.y + board.settings[1].margin.y * y;
             var piece;
             if ((x + y) % 2 == 0) {
-                var randomPiece = this.getRandomPiece('h', false);
+                var randomPiece = this.createEmptyPiece('h', false);
                 piece = game.add.image(boardX, boardY, randomPiece.piece);
             }
             else {
-                var randomPiece = this.getRandomPiece('v', false);
+                var randomPiece = this.createEmptyPiece('v', false);
                 piece = game.add.image(boardX, boardY, randomPiece.piece);
             }
             piece.shape = randomPiece.shape;
@@ -181,7 +181,7 @@ Game.Game.prototype = {
     },
 
     createAsk: function() {
-        var randomPiece = this.getRandomPiece('h', true);
+        var randomPiece = this.createEmptyPiece('h', true);
         var ask = game.add.image(board.settings[1].ask.x, board.settings[1].ask.y, randomPiece.piece);
         ask.orientation = randomPiece.orientation;
         ask.isDrop = randomPiece.isDrop;
@@ -191,7 +191,7 @@ Game.Game.prototype = {
         gameUI.add(ask);
     },
 
-    getEmptyPiece: function(orientation) {
+    createEmptyPiece: function(orientation) {
         var piece = {
             orientation: orientation
         };
@@ -204,7 +204,7 @@ Game.Game.prototype = {
         return piece;
     },
 
-    getRandomPiece: function(orientation, isDrop) {
+    createEmptyPiece: function(orientation, isDrop) {
         var rand = Math.floor(Math.random() * piecesHorizontal.length);
         var piece = {
             shape: {},
