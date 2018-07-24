@@ -10,12 +10,10 @@ var board;
 // Board pieces holder
 var boardPieces = [];
 // Board pieces
-var piecesHorizontal = [];
-var piecesHorizontalDrop = [];
-var pieceHorizontalEmpty;
-var piecesVertical = [];
-var piecesVerticalDrop = [];
-var pieceVerticalEmpty;
+var pieceShapes = [];
+var pieceColors = [];
+// Current ask piece
+var askPiece;
 
 // UI groups
 var gameUI;
@@ -94,53 +92,14 @@ Game.Game.prototype = {
 
     createNewGame: function() {
         this.createBoard();
-        this.createAsk();
+        this.createAskPiece();
     },
 
     setupPieces: function() {
-        // Horizontal pieces
-        piecesHorizontal.push('puzzle_apple_brown_h');
-        piecesHorizontal.push('puzzle_apple_purple_h');
-        piecesHorizontal.push('puzzle_apple_orange_h');
-        piecesHorizontal.push('puzzle_grape_brown_h');
-        piecesHorizontal.push('puzzle_grape_purple_h');
-        piecesHorizontal.push('puzzle_grape_orange_h');
-        piecesHorizontal.push('puzzle_pineapple_brown_h');
-        piecesHorizontal.push('puzzle_pineapple_purple_h');
-        piecesHorizontal.push('puzzle_pineapple_orange_h');
-        // Horizontal drop pieces
-        piecesHorizontalDrop.push('puzzle_apple_brown_h_drop');
-        piecesHorizontalDrop.push('puzzle_apple_purple_h_drop');
-        piecesHorizontalDrop.push('puzzle_apple_orange_h_drop');
-        piecesHorizontalDrop.push('puzzle_grape_brown_h_drop');
-        piecesHorizontalDrop.push('puzzle_grape_purple_h_drop');
-        piecesHorizontalDrop.push('puzzle_grape_orange_h_drop');
-        piecesHorizontalDrop.push('puzzle_pineapple_brown_h_drop');
-        piecesHorizontalDrop.push('puzzle_pineapple_purple_h_drop');
-        piecesHorizontalDrop.push('puzzle_pineapple_orange_h_drop');
-        // Vertical pieces
-        piecesVertical.push('puzzle_apple_brown_v');
-        piecesVertical.push('puzzle_apple_purple_v');
-        piecesVertical.push('puzzle_apple_orange_v');
-        piecesVertical.push('puzzle_grape_brown_v');
-        piecesVertical.push('puzzle_grape_purple_v');
-        piecesVertical.push('puzzle_grape_orange_v');
-        piecesVertical.push('puzzle_pineapple_brown_v');
-        piecesVertical.push('puzzle_pineapple_purple_v');
-        piecesVertical.push('puzzle_pineapple_orange_v');
-        // Vertical drop pieces
-        piecesVerticalDrop.push('puzzle_apple_brown_v_drop');
-        piecesVerticalDrop.push('puzzle_apple_purple_v_drop');
-        piecesVerticalDrop.push('puzzle_apple_orange_v_drop');
-        piecesVerticalDrop.push('puzzle_grape_brown_v_drop');
-        piecesVerticalDrop.push('puzzle_grape_purple_v_drop');
-        piecesVerticalDrop.push('puzzle_grape_orange_v_drop');
-        piecesVerticalDrop.push('puzzle_pineapple_brown_v_drop');
-        piecesVerticalDrop.push('puzzle_pineapple_purple_v_drop');
-        piecesVerticalDrop.push('puzzle_pineapple_orange_v_drop');
-        // Empty pieces
-        pieceHorizontalEmpty = 'puzzle_empty_h';
-        pieceVerticalEmpty = 'puzzle_empty_v';
+        // Piece shapes
+        pieceShapes.push('apple', 'grape', 'pineapple');
+        // Piece colors
+        pieceColors.push('brown', 'purple', 'orange');
     },
 
     createBoard: function() {
@@ -148,7 +107,7 @@ Game.Game.prototype = {
         for (var i = 0; i < board.settings[1].size; i++) {
             boardPieces[i] = [];
             for (var j = 0; j < board.settings[1].size; j++) {
-                boardPieces[i][j] = {};
+                boardPieces[i][j] = null;
             }
         }
         // Create a new board
@@ -160,17 +119,19 @@ Game.Game.prototype = {
             var boardY = board.settings[1].start.y + board.settings[1].margin.y * y;
             var piece;
             if ((x + y) % 2 == 0) {
-                var randomPiece = this.createEmptyPiece('h', false);
-                piece = game.add.image(boardX, boardY, randomPiece.piece);
+                var randomPiece = this.generateRandomPiece('h', false);
+                piece = game.add.image(boardX, boardY, randomPiece);
             }
             else {
-                var randomPiece = this.createEmptyPiece('v', false);
-                piece = game.add.image(boardX, boardY, randomPiece.piece);
+                var randomPiece = this.generateRandomPiece('v', false);
+                piece = game.add.image(boardX, boardY, randomPiece);
             }
-            piece.shape = randomPiece.shape;
-            piece.color = randomPiece.color;
-            piece.orientation = randomPiece.orientation;
-            piece.isDrop = randomPiece.isDrop;
+            var pieceSplit = piece.key.split('_');
+            piece.shape = pieceSplit[1];
+            piece.color = pieceSplit[2];
+            piece.orientation = pieceSplit[3];
+            piece.xPos = x;
+            piece.yPos = y;
             piece.anchor.set(0.5);
             piece.scale.set(board.settings[1].scale);
 
@@ -180,58 +141,152 @@ Game.Game.prototype = {
         }
     },
 
-    createAsk: function() {
-        var randomPiece = this.createEmptyPiece('h', true);
-        var ask = game.add.image(board.settings[1].ask.x, board.settings[1].ask.y, randomPiece.piece);
-        ask.orientation = randomPiece.orientation;
-        ask.isDrop = randomPiece.isDrop;
-        ask.anchor.set(0.5);
-        ask.scale.set(board.settings[1].scale);
+    createAskPiece: function() {
+        var targetPiece = this.getRandomPiece();
+        var askPieceString = null;
+        while (askPieceString == null) {
+            askPieceString = this.generateAskPiece(targetPiece.xPos, targetPiece.yPos);
+        } 
+        askPiece = game.add.image(board.settings[1].ask.x, board.settings[1].ask.y, askPieceString);
+        var pieceSplit = askPiece.key.split('_');
+        askPiece.shape = pieceSplit[1];
+        askPiece.color = pieceSplit[2];
+        askPiece.orientation = pieceSplit[3];
+        askPiece.anchor.set(0.5);
+        askPiece.scale.set(board.settings[1].scale);
         
-        gameUI.add(ask);
+        gameUI.add(askPiece);
     },
 
-    createEmptyPiece: function(orientation) {
-        var piece = {
-            orientation: orientation
-        };
-        if (orientation == 'h') {
-            piece.piece = pieceHorizontalEmpty;
-        }
-        else { // orientation == 'v'
-            piece.piece = pieceVerticalEmpty;
-        }
-        return piece;
+    generateEmptyPiece: function(orientation) {
+        return "puzzle_empty_" + orientation;
     },
 
-    createEmptyPiece: function(orientation, isDrop) {
-        var rand = Math.floor(Math.random() * piecesHorizontal.length);
-        var piece = {
-            shape: {},
-            color: {},
-            orientation: orientation,
-            isDrop: isDrop
-        };
-        if (orientation == 'h') {
-            if (isDrop) {
-                piece.piece = piecesHorizontalDrop[rand];
+    generateRandomPiece: function(orientation, isDrop, shape = null, color = null) {
+        // Returns a random piece name string with orientation, isDrop, shape, and color
+        // Will return random shape/color if shape/color is null
+        var pieceString = "puzzle";
+        if (shape) {
+            pieceString += '_' + shape;
+        }
+        else {
+            pieceString += '_' + pieceShapes[Math.floor(Math.random() * pieceShapes.length)];
+        }
+        if (color) {
+            pieceString += '_' + color;
+        }
+        else {
+            pieceString += '_' + pieceColors[Math.floor(Math.random() * pieceColors.length)];
+        }
+        pieceString += '_' + orientation;
+        if (isDrop) {
+            pieceString += '_drop';
+        }
+        return pieceString;
+    },
+
+    generateAskPiece: function(x, y) {
+        // Returns a random valid ask piece string for target piece at x, y
+        var validPieces = [];
+        var potentialPos = [
+            {x: x, y: y-1},
+            {x: x, y: y+1},
+            {x: x-1, y: y},
+            {x: x+1, y: y}
+        ];
+        var targetOrientation = boardPieces[x][y].orientation;
+        
+        // Populate validPieces with valid piece properties
+        for (var i = 0; i < potentialPos.length; i++) {
+            // Board occupied check
+            if (boardPieces[potentialPos[i].x][potentialPos[i].y] != null) {
+                continue;
             }
-            else {
-                piece.piece = piecesHorizontal[rand];
+
+            var checkPos = [
+                {x: potentialPos[i].x, y: potentialPos[i].y-1},
+                {x: potentialPos[i].x, y: potentialPos[i].y+1},
+                {x: potentialPos[i].x-1, y: potentialPos[i].y},
+                {x: potentialPos[i].x+1, y: potentialPos[i].y}
+            ];
+            var colors = [];
+            var shapes = [];
+            for (var j = 0; j < checkPos.length; j++) {
+                var xCheck = checkPos[j].x;
+                var yCheck = checkPos[j].y;
+                // Board boundaries check
+                if (xCheck < 0 || xCheck >= board.settings[1].size || yCheck < 0 || yCheck >= board.settings[1].size) {
+                    continue;
+                }
+
+                if (targetOrientation == 'h') {
+                    // Target is horizontal, so Answer is vertical
+                    // Vertical = same color
+                    // Check surrounding colors
+                    if (boardPieces[xCheck][yCheck] != null) {
+                        colors.push(boardPieces[xCheck][yCheck].color);
+                    }
+                }
+                else { // targetOrientation == 'v'
+                    // Target is vertical, so Answer is horizontal
+                    // Horizontal = same shape
+                    // Check surrounding shapes
+                    if (boardPieces[xCheck][yCheck] != null) {
+                        shapes.push(boardPieces[xCheck][yCheck].shape);
+                    }
+                }
+            }
+
+            // Validity check
+            if (targetOrientation == 'h') {
+                // Color validity check
+                if (colors.every((val, i, arr) => val == arr[0])) {
+                    var askPiece = {
+                        shape: null,
+                        color: colors[0],
+                        orientation: 'v'
+                    }
+                    validPieces.push(askPiece);
+                }
+            }
+            else { // targetOrientation == 'v'
+                // Shape validity check
+                if (shapes.every((val, i, arr) => val == arr[0])) {
+                    var askPiece = {
+                        shape: shapes[0],
+                        color: null,
+                        orientation: 'h'
+                    }
+                    validPieces.push(askPiece);
+                }
             }
         }
-        else { // orientation == 'v'
-            if (isDrop) {
-                piece.piece = piecesVerticalDrop[rand];
-            }
-            else {
-                piece.piece = piecesVertical[rand];
+        
+        // No valid ask piece
+        if (validPieces.length == 0) {
+            return null;
+        }
+
+        // Pick a random valid piece's properties
+        var rand = Math.floor(Math.random() * validPieces.length);
+        var pieceProperties = validPieces[rand];
+        // Create a random piece string with specified properties. Null will be filled with random
+        var returnPiece = this.generateRandomPiece(pieceProperties.orientation, true, pieceProperties.shape, pieceProperties.color);
+        return returnPiece;
+    },
+
+    getRandomPiece: function() {
+        // Returns a random active board piece
+        var activePieces = [];
+        for (var i = 0; i < board.settings[1].size; i++) {
+            for (var j = 0; j < board.settings[1].size; j++) {
+                if (boardPieces[i][j]) {
+                    activePieces.push(boardPieces[i][j]);
+                }
             }
         }
-        var pieceSplit = piece.piece.split("_");
-        piece.shape = pieceSplit[1];
-        piece.color = pieceSplit[2];
-        return piece;
+        var randomPiece = activePieces[Math.floor(Math.random() * activePieces.length)];
+        return randomPiece;
     },
 
     pause: function() {
