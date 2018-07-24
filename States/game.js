@@ -14,10 +14,13 @@ var pieceShapes = [];
 var pieceColors = [];
 // Current ask piece
 var askPiece;
+// Ask slots holder
+var askSlots = [];
 
 // UI groups
 var gameUI;
 var pauseMenu;
+var askSlotsUI;
 // Input enabled Game UI array
 var gameInputEnabledUI;
 
@@ -93,6 +96,7 @@ Game.Game.prototype = {
     createNewGame: function() {
         this.createBoard();
         this.createAskPiece();
+        this.drawAskSlots();
     },
 
     setupPieces: function() {
@@ -154,8 +158,61 @@ Game.Game.prototype = {
         askPiece.orientation = pieceSplit[3];
         askPiece.anchor.set(0.5);
         askPiece.scale.set(board.settings[1].scale);
-        
+
         gameUI.add(askPiece);
+    },
+
+    drawAskSlots: function() {
+        // Clear ask slots
+        for (var i = 0; i < board.settings[1].size; i++) {
+            askSlots[i] = [];
+            for (var j = 0; j < board.settings[1].size; j++) {
+                askSlots[i][j] = null;
+            }
+        }
+        askSlotsUI = game.add.group();
+
+        // Draw each valid ask slots
+        for (var i = 0; i < board.settings[1].size; i++) {
+            for (var j = 0; j < board.settings[1].size; j++) {
+                // Orientation check
+                // Ask piece orientation != Board piece orientation
+                if (((i + j) % 2 == 0 && askPiece.orientation == 'h') || ((i + j) % 2 != 0 && askPiece.orientation == 'v')) {
+                    continue;
+                }
+
+                var checkPos = [
+                    {x: i, y: j-1},
+                    {x: i, y: j+1},
+                    {x: i-1, y: j},
+                    {x: i+1, y: j}
+                ];
+                if (boardPieces[i][j] != null) {
+                    for (var k = 0; k < checkPos.length; k++) {
+                        xCheck = checkPos[k].x;
+                        yCheck = checkPos[k].y;
+                        // Ask slots and board piece occupied check
+                        if (askSlots[xCheck][yCheck] != null || boardPieces[xCheck][yCheck] != null) {
+                            continue;
+                        }
+                        // Board boundaries check
+                        if (xCheck < 0 || xCheck >= board.settings[1].size || yCheck < 0 || yCheck >= board.settings[1].size) {
+                            continue;
+                        }
+
+                        // Draw ask slot on xCheck, yCheck
+                        var boardX = board.settings[1].start.x + board.settings[1].margin.x * xCheck;
+                        var boardY = board.settings[1].start.y + board.settings[1].margin.y * yCheck;
+                        var askSlot = game.add.image(boardX, boardY, this.generateEmptyPiece(askPiece.orientation));
+
+                        askSlot.anchor.set(0.5);
+                        askSlot.scale.set(board.settings[1].scale);
+
+                        askSlotsUI.add(askSlot);
+                    }
+                }
+            }
+        }
     },
 
     generateEmptyPiece: function(orientation) {
