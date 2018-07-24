@@ -7,6 +7,8 @@ var level = 1;
 
 // Board settings
 var board;
+// Board pieces holder
+var boardPieces = [];
 // Board pieces
 var piecesHorizontal = [];
 var piecesHorizontalDrop = [];
@@ -142,13 +144,22 @@ Game.Game.prototype = {
     },
 
     createBoard: function() {
+        // Clear board
+        for (var i = 0; i < board.settings[1].size; i++) {
+            boardPieces[i] = [];
+            for (var j = 0; j < board.settings[1].size; j++) {
+                boardPieces[i][j] = {};
+            }
+        }
         // Create a new board
         var arrangements = board.arrangements[1][Math.floor(Math.random() * board.arrangements[1].length)];
         for (var i = 0; i < arrangements.length; i++) {
-            var boardX = board.settings[1].start.x + board.settings[1].margin.x * arrangements[i].x;
-            var boardY = board.settings[1].start.y + board.settings[1].margin.y * arrangements[i].y;
+            var x = arrangements[i].x;
+            var y = arrangements[i].y;
+            var boardX = board.settings[1].start.x + board.settings[1].margin.x * x;
+            var boardY = board.settings[1].start.y + board.settings[1].margin.y * y;
             var piece;
-            if ((arrangements[i].x + arrangements[i].y) % 2 == 0) {
+            if ((x + y) % 2 == 0) {
                 var randomPiece = this.getRandomPiece('h', false);
                 piece = game.add.image(boardX, boardY, randomPiece.piece);
             }
@@ -156,10 +167,14 @@ Game.Game.prototype = {
                 var randomPiece = this.getRandomPiece('v', false);
                 piece = game.add.image(boardX, boardY, randomPiece.piece);
             }
+            piece.shape = randomPiece.shape;
+            piece.color = randomPiece.color;
             piece.orientation = randomPiece.orientation;
             piece.isDrop = randomPiece.isDrop;
             piece.anchor.set(0.5);
             piece.scale.set(board.settings[1].scale);
+
+            boardPieces[x][y] = piece;
 
             gameUI.add(piece);
         }
@@ -192,6 +207,8 @@ Game.Game.prototype = {
     getRandomPiece: function(orientation, isDrop) {
         var rand = Math.floor(Math.random() * piecesHorizontal.length);
         var piece = {
+            shape: {},
+            color: {},
             orientation: orientation,
             isDrop: isDrop
         };
@@ -211,6 +228,9 @@ Game.Game.prototype = {
                 piece.piece = piecesVertical[rand];
             }
         }
+        var pieceSplit = piece.piece.split("_");
+        piece.shape = pieceSplit[1];
+        piece.color = pieceSplit[2];
         return piece;
     },
 
