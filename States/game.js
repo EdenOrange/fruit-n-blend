@@ -41,6 +41,13 @@ var board = {
     }
     // */
 }
+// Board pieces
+var piecesHorizontal = [];
+var piecesHorizontalDrop = [];
+var pieceHorizontalEmpty;
+var piecesVertical = [];
+var piecesVerticalDrop = [];
+var pieceVerticalEmpty;
 
 // UI groups
 var gameUI;
@@ -56,6 +63,7 @@ Game.Game.prototype = {
     create: function() {
         this.createGameUI();
         this.createPauseMenu();
+        this.setupPieces();
         this.createNewGame();
     },
 
@@ -117,6 +125,52 @@ Game.Game.prototype = {
         this.createAsk();
     },
 
+    setupPieces: function() {
+        // Horizontal pieces
+        piecesHorizontal.push('puzzle_apple_brown_h');
+        piecesHorizontal.push('puzzle_apple_purple_h');
+        piecesHorizontal.push('puzzle_apple_orange_h');
+        piecesHorizontal.push('puzzle_grape_brown_h');
+        piecesHorizontal.push('puzzle_grape_purple_h');
+        piecesHorizontal.push('puzzle_grape_orange_h');
+        piecesHorizontal.push('puzzle_pineapple_brown_h');
+        piecesHorizontal.push('puzzle_pineapple_purple_h');
+        piecesHorizontal.push('puzzle_pineapple_orange_h');
+        // Horizontal drop pieces
+        piecesHorizontalDrop.push('puzzle_apple_brown_h_drop');
+        piecesHorizontalDrop.push('puzzle_apple_purple_h_drop');
+        piecesHorizontalDrop.push('puzzle_apple_orange_h_drop');
+        piecesHorizontalDrop.push('puzzle_grape_brown_h_drop');
+        piecesHorizontalDrop.push('puzzle_grape_purple_h_drop');
+        piecesHorizontalDrop.push('puzzle_grape_orange_h_drop');
+        piecesHorizontalDrop.push('puzzle_pineapple_brown_h_drop');
+        piecesHorizontalDrop.push('puzzle_pineapple_purple_h_drop');
+        piecesHorizontalDrop.push('puzzle_pineapple_orange_h_drop');
+        // Vertical pieces
+        piecesVertical.push('puzzle_apple_brown_v');
+        piecesVertical.push('puzzle_apple_purple_v');
+        piecesVertical.push('puzzle_apple_orange_v');
+        piecesVertical.push('puzzle_grape_brown_v');
+        piecesVertical.push('puzzle_grape_purple_v');
+        piecesVertical.push('puzzle_grape_orange_v');
+        piecesVertical.push('puzzle_pineapple_brown_v');
+        piecesVertical.push('puzzle_pineapple_purple_v');
+        piecesVertical.push('puzzle_pineapple_orange_v');
+        // Vertical drop pieces
+        piecesVerticalDrop.push('puzzle_apple_brown_v_drop');
+        piecesVerticalDrop.push('puzzle_apple_purple_v_drop');
+        piecesVerticalDrop.push('puzzle_apple_orange_v_drop');
+        piecesVerticalDrop.push('puzzle_grape_brown_v_drop');
+        piecesVerticalDrop.push('puzzle_grape_purple_v_drop');
+        piecesVerticalDrop.push('puzzle_grape_orange_v_drop');
+        piecesVerticalDrop.push('puzzle_pineapple_brown_v_drop');
+        piecesVerticalDrop.push('puzzle_pineapple_purple_v_drop');
+        piecesVerticalDrop.push('puzzle_pineapple_orange_v_drop');
+        // Empty pieces
+        pieceHorizontalEmpty = 'puzzle_empty_h';
+        pieceVerticalEmpty = 'puzzle_empty_v';
+    },
+
     createBoard: function() {
         // Create a new board
         for (var i = 0; i < board.size; i++) {
@@ -125,10 +179,10 @@ Game.Game.prototype = {
                 var boardY = board.start.y + board.margin.y * i;
                 var piece;
                 if ((i + j) % 2 == 0) {
-                    piece = game.add.image(boardX, boardY, 'puzzle_empty_h');
+                    piece = game.add.image(boardX, boardY, this.getRandomPiece('h', false));
                 }
                 else {
-                    piece = game.add.image(boardX, boardY, 'puzzle_grape_orange_v');
+                    piece = game.add.image(boardX, boardY, this.getRandomPiece('v', false));
                 }
                 piece.anchor.set(0.5);
                 piece.scale.set(board.scale);
@@ -139,11 +193,31 @@ Game.Game.prototype = {
     },
 
     createAsk: function() {
-        var ask = game.add.image(board.ask.x, board.ask.y, 'puzzle_apple_purple_h_drop');
+        var ask = game.add.image(board.ask.x, board.ask.y, this.getRandomPiece('h', true));
         ask.anchor.set(0.5);
         ask.scale.set(board.scale);
 
         gameUI.add(ask);
+    },
+
+    getRandomPiece: function(orientation, isDrop) {
+        var rand = Math.floor(Math.random() * piecesHorizontal.length);
+        if (orientation == 'h') {
+            if (isDrop) {
+                return piecesHorizontalDrop[rand];
+            }
+            else {
+                return piecesHorizontal[rand];
+            }            
+        }
+        else { // orientation == 'v'
+            if (isDrop) {
+                return piecesVerticalDrop[rand];
+            }
+            else {
+                return piecesVertical[rand];
+            }
+        }
     },
 
     pause: function() {
