@@ -3,10 +3,11 @@ Game.Game = function(game) {
 }
 
 // Current level
-var level;
+var level = 1;
 
 // Board settings
 var board = {
+    /* size-4
     size: 4,        // Board maximum size
     start: {
         x: 270,     // Board starting x-coordinate
@@ -16,10 +17,29 @@ var board = {
         x: 105,     // Board piece margin x-axis
         y: 105,     // Board piece margin y-axis
     },
+    scale: 1.3,     // Board piece scale
     ask: {
         x: 100,     // Asking piece x-coordinate
         y: 810      // Asking piece y-coordinate
     }
+    */
+
+    // /* size-5
+    size: 5,        // Board maximum size
+    start: {
+        x: 250,     // Board starting x-coordinate
+        y: 790      // Board starting y-coordinate
+    },
+    margin: {
+        x: 95,     // Board piece margin x-axis
+        y: 95,     // Board piece margin y-axis
+    },
+    scale: 1.2,     // Board piece scale
+    ask: {
+        x: 90,     // Asking piece x-coordinate
+        y: 800      // Asking piece y-coordinate
+    }
+    // */
 }
 
 // UI groups
@@ -99,27 +119,29 @@ Game.Game.prototype = {
 
     createBoard: function() {
         // Create a new board
-        for (var i = 0; i < board.size * board.size; i++) {
-            var boardX = board.start.x + board.margin.x * (i % board.size);
-            var boardY = board.start.y + board.margin.y * Math.floor(i / board.size);
-            var piece;
-            if ((i + Math.floor(i / board.size)) % 2 == 0) {
-                piece = game.add.image(boardX, boardY, 'puzzle_empty_h');
-            }
-            else {
-                piece = game.add.image(boardX, boardY, 'puzzle_grape_orange_v');
-            }
-            piece.anchor.set(0.5);
-            piece.scale.set(1.3);
+        for (var i = 0; i < board.size; i++) {
+            for (var j = 0; j < board.size; j++) {
+                var boardX = board.start.x + board.margin.x * j;
+                var boardY = board.start.y + board.margin.y * i;
+                var piece;
+                if ((i + j) % 2 == 0) {
+                    piece = game.add.image(boardX, boardY, 'puzzle_empty_h');
+                }
+                else {
+                    piece = game.add.image(boardX, boardY, 'puzzle_grape_orange_v');
+                }
+                piece.anchor.set(0.5);
+                piece.scale.set(board.scale);
 
-            gameUI.add(piece);
+                gameUI.add(piece);
+            }
         }
     },
 
     createAsk: function() {
         var ask = game.add.image(board.ask.x, board.ask.y, 'puzzle_apple_purple_h_drop');
         ask.anchor.set(0.5);
-        ask.scale.set(1.3);
+        ask.scale.set(board.scale);
 
         gameUI.add(ask);
     },
