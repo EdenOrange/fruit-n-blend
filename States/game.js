@@ -143,26 +143,25 @@ Game.Game.prototype = {
 
     createBoard: function() {
         // Create a new board
-        for (var i = 0; i < board.settings[1].size; i++) {
-            for (var j = 0; j < board.settings[1].size; j++) {
-                var boardX = board.settings[1].start.x + board.settings[1].margin.x * j;
-                var boardY = board.settings[1].start.y + board.settings[1].margin.y * i;
-                var piece;
-                if ((i + j) % 2 == 0) {
-                    var randomPiece = this.getRandomPiece('h', false);
-                    piece = game.add.image(boardX, boardY, randomPiece.piece);
-                }
-                else {
-                    var randomPiece = this.getRandomPiece('v', false);
-                    piece = game.add.image(boardX, boardY, randomPiece.piece);
-                }
-                piece.orientation = randomPiece.orientation;
-                piece.isDrop = randomPiece.isDrop;
-                piece.anchor.set(0.5);
-                piece.scale.set(board.settings[1].scale);
-
-                gameUI.add(piece);
+        var arrangements = board.arrangements[1][Math.floor(Math.random() * board.arrangements[1].length)];
+        for (var i = 0; i < arrangements.length; i++) {
+            var boardX = board.settings[1].start.x + board.settings[1].margin.x * arrangements[i].x;
+            var boardY = board.settings[1].start.y + board.settings[1].margin.y * arrangements[i].y;
+            var piece;
+            if ((arrangements[i].x + arrangements[i].y) % 2 == 0) {
+                var randomPiece = this.getRandomPiece('h', false);
+                piece = game.add.image(boardX, boardY, randomPiece.piece);
             }
+            else {
+                var randomPiece = this.getRandomPiece('v', false);
+                piece = game.add.image(boardX, boardY, randomPiece.piece);
+            }
+            piece.orientation = randomPiece.orientation;
+            piece.isDrop = randomPiece.isDrop;
+            piece.anchor.set(0.5);
+            piece.scale.set(board.settings[1].scale);
+
+            gameUI.add(piece);
         }
     },
 
