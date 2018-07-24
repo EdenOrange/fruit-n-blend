@@ -72,6 +72,9 @@ Game.Load.prototype = {
         game.load.image('puzzle_empty_h', 'Assets/Game/Puzzle/puzzle2.png');
         game.load.image('puzzle_empty_v', 'Assets/Game/Puzzle/puzzle1.png');
 
+        // Game - Board
+        game.load.json('board', 'Data/board.json');
+
         // Game - Pause
         game.load.image('pause_background', 'Assets/Game/Pause/pause.png');
         game.load.image('pause_quit', 'Assets/Game/Pause/quit.png');

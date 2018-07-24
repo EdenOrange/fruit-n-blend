@@ -6,41 +6,7 @@ Game.Game = function(game) {
 var level = 1;
 
 // Board settings
-var board = {
-    /* size-4
-    size: 4,        // Board maximum size
-    start: {
-        x: 270,     // Board starting x-coordinate
-        y: 850      // Board starting y-coordinate
-    },
-    margin: {
-        x: 105,     // Board piece margin x-axis
-        y: 105,     // Board piece margin y-axis
-    },
-    scale: 1.3,     // Board piece scale
-    ask: {
-        x: 100,     // Asking piece x-coordinate
-        y: 810      // Asking piece y-coordinate
-    }
-    */
-
-    // /* size-5
-    size: 5,        // Board maximum size
-    start: {
-        x: 250,     // Board starting x-coordinate
-        y: 790      // Board starting y-coordinate
-    },
-    margin: {
-        x: 95,     // Board piece margin x-axis
-        y: 95,     // Board piece margin y-axis
-    },
-    scale: 1.2,     // Board piece scale
-    ask: {
-        x: 90,     // Asking piece x-coordinate
-        y: 800      // Asking piece y-coordinate
-    }
-    // */
-}
+var board;
 // Board pieces
 var piecesHorizontal = [];
 var piecesHorizontalDrop = [];
@@ -58,6 +24,10 @@ var gameInputEnabledUI;
 Game.Game.prototype = {
     init: function(level) {
         this.level = level;
+    },
+
+    preload: function() {
+        board = game.cache.getJSON('board');
     },
 
     create: function() {
@@ -173,19 +143,23 @@ Game.Game.prototype = {
 
     createBoard: function() {
         // Create a new board
-        for (var i = 0; i < board.size; i++) {
-            for (var j = 0; j < board.size; j++) {
-                var boardX = board.start.x + board.margin.x * j;
-                var boardY = board.start.y + board.margin.y * i;
+        for (var i = 0; i < board.settings[1].size; i++) {
+            for (var j = 0; j < board.settings[1].size; j++) {
+                var boardX = board.settings[1].start.x + board.settings[1].margin.x * j;
+                var boardY = board.settings[1].start.y + board.settings[1].margin.y * i;
                 var piece;
                 if ((i + j) % 2 == 0) {
-                    piece = game.add.image(boardX, boardY, this.getRandomPiece('h', false));
+                    var randomPiece = this.getRandomPiece('h', false);
+                    piece = game.add.image(boardX, boardY, randomPiece.piece);
                 }
                 else {
-                    piece = game.add.image(boardX, boardY, this.getRandomPiece('v', false));
+                    var randomPiece = this.getRandomPiece('v', false);
+                    piece = game.add.image(boardX, boardY, randomPiece.piece);
                 }
+                piece.orientation = randomPiece.orientation;
+                piece.isDrop = randomPiece.isDrop;
                 piece.anchor.set(0.5);
-                piece.scale.set(board.scale);
+                piece.scale.set(board.settings[1].scale);
 
                 gameUI.add(piece);
             }
@@ -193,31 +167,52 @@ Game.Game.prototype = {
     },
 
     createAsk: function() {
-        var ask = game.add.image(board.ask.x, board.ask.y, this.getRandomPiece('h', true));
+        var randomPiece = this.getRandomPiece('h', true);
+        var ask = game.add.image(board.settings[1].ask.x, board.settings[1].ask.y, randomPiece.piece);
+        ask.orientation = randomPiece.orientation;
+        ask.isDrop = randomPiece.isDrop;
         ask.anchor.set(0.5);
-        ask.scale.set(board.scale);
-
+        ask.scale.set(board.settings[1].scale);
+        
         gameUI.add(ask);
+    },
+
+    getEmptyPiece: function(orientation) {
+        var piece = {
+            orientation: orientation
+        };
+        if (orientation == 'h') {
+            piece.piece = pieceHorizontalEmpty;
+        }
+        else { // orientation == 'v'
+            piece.piece = pieceVerticalEmpty;
+        }
+        return piece;
     },
 
     getRandomPiece: function(orientation, isDrop) {
         var rand = Math.floor(Math.random() * piecesHorizontal.length);
+        var piece = {
+            orientation: orientation,
+            isDrop: isDrop
+        };
         if (orientation == 'h') {
             if (isDrop) {
-                return piecesHorizontalDrop[rand];
+                piece.piece = piecesHorizontalDrop[rand];
             }
             else {
-                return piecesHorizontal[rand];
-            }            
+                piece.piece = piecesHorizontal[rand];
+            }
         }
         else { // orientation == 'v'
             if (isDrop) {
-                return piecesVerticalDrop[rand];
+                piece.piece = piecesVerticalDrop[rand];
             }
             else {
-                return piecesVertical[rand];
+                piece.piece = piecesVertical[rand];
             }
         }
+        return piece;
     },
 
     pause: function() {
