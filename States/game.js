@@ -6,6 +6,10 @@ Game.Game = function(game) {
 var level = 1;
 var juiceCount = 0;
 var juiceText;
+var timer;
+var timeLimit = 30;
+var timePenalty = 0;
+var timeText;
 
 // Board settings
 var board;
@@ -42,6 +46,19 @@ Game.Game.prototype = {
         this.createNewGame();
     },
 
+    update: function() {
+        var timeLeft = timeLimit - timer.seconds - timePenalty;
+        if (timeLeft <= 0) {
+            timer.stop();
+            this.loseGame();
+        }
+        if (timer.running) {
+            var minutes = "0" + Math.floor(Math.round(timeLeft) / 60);
+            var seconds = "0" + (Math.round(timeLeft) - minutes * 60);
+            timeText.text = minutes.substr(-1) + ":" + seconds.substr(-2);
+        }
+    },
+
     createGameUI: function() {
         gameUI = game.add.group();
         gameInputEnabledUI = [];
@@ -52,6 +69,7 @@ Game.Game.prototype = {
         var juice = game.add.image(160, 35, 'game_juice');
         juiceText = game.add.text(150, 55, juiceCount.toString());
         var time = game.add.image(400, 50, 'game_time');
+        timeText = game.add.text(380, 55, "0:00");
         var pauseButton = game.add.image(660, 50, 'game_pause');
 
         blender.anchor.set(0.5);
@@ -74,8 +92,17 @@ Game.Game.prototype = {
         juiceText.stroke = "#000000";
         juiceText.strokeThickness = 5;
         juiceText.align = "center";
+
+        timeText.anchor.set(0.5);
+        timeText.font = "Poplar";
+        timeText.fontSize = "40px";
+        timeText.fontWeight = "Bold";
+        timeText.fill = "#ffffff";
+        timeText.stroke = "#000000";
+        timeText.strokeThickness = 5;
+        timeText.align = "center";
         
-        gameUI.addMultiple([background, blender, fruitBasket, juice, juiceText, time, pauseButton]);
+        gameUI.addMultiple([background, blender, fruitBasket, juice, juiceText, time, timeText, pauseButton]);
         gameInputEnabledUI.push(pauseButton);
     },
 
@@ -109,6 +136,10 @@ Game.Game.prototype = {
         this.resetJuice();
         this.createBoard();
         this.createAskPiece();
+
+        timer = game.time.create(false);
+        timePenalty = 0;
+        timer.start();
     },
 
     setupPieces: function() {
@@ -317,7 +348,7 @@ Game.Game.prototype = {
 
     wrongAnswer: function(x, y) {
         this.playWrongAnim(askSlots[x][y]);
-        // Time penalty
+        timePenalty++;
     },
 
     playWrongAnim: function(askSlot) {
@@ -476,7 +507,17 @@ Game.Game.prototype = {
         return randomPiece;
     },
 
+    loseGame: function() {
+        console.log("Lose Game");
+    },
+
+    winGame: function() {
+        console.log("Win Game");
+    },
+
     pause: function() {
+        timer.pause();
+
         // Add gray filter to Game UI
         var grayFilter = game.add.filter('Gray');
         gameUI.filters = [grayFilter];
@@ -494,6 +535,8 @@ Game.Game.prototype = {
     },
 
     resume: function() {
+        timer.resume();
+
         // Remove gray filter from Game UI
         gameUI.filters = null;
         // Lighten back up Game UI
