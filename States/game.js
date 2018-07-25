@@ -665,6 +665,12 @@ Game.Game.prototype = {
     winGame: function() {
         this.freezeGame();
 
+        // Update levels unlocked
+        var levelsUnlocked = localStorage.getItem('levelsUnlocked');
+        if (levelsUnlocked == level) {
+            localStorage.setItem('levelsUnlocked', level + 1);
+        }
+
         // Show Win Screen
         winScreen.visible = true;
         game.world.bringToTop(winScreen);
