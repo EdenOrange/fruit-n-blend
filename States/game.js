@@ -4,6 +4,8 @@ Game.Game = function(game) {
 
 // Current level
 var level = 1;
+var juiceCount = 0;
+var juiceText;
 
 // Board settings
 var board;
@@ -48,6 +50,7 @@ Game.Game.prototype = {
         var blender = game.add.image(250, 420, 'game_blender');
         var fruitBasket = game.add.image(580, 480, 'game_fruit_basket');
         var juice = game.add.image(160, 35, 'game_juice');
+        juiceText = game.add.text(150, 55, juiceCount.toString());
         var time = game.add.image(400, 50, 'game_time');
         var pauseButton = game.add.image(660, 50, 'game_pause');
 
@@ -62,8 +65,17 @@ Game.Game.prototype = {
         pauseButton.anchor.set(0.5);
         pauseButton.inputEnabled = true;
         pauseButton.events.onInputDown.add(this.pause, this);
+
+        juiceText.anchor.set(0.5);
+        juiceText.font = "Poplar";
+        juiceText.fontSize = "40px";
+        juiceText.fontWeight = "Bold";
+        juiceText.fill = "#ffffff";
+        juiceText.stroke = "#000000";
+        juiceText.strokeThickness = 5;
+        juiceText.align = "center";
         
-        gameUI.addMultiple([background, blender, fruitBasket, juice, time, pauseButton]);
+        gameUI.addMultiple([background, blender, fruitBasket, juice, juiceText, time, pauseButton]);
         gameInputEnabledUI.push(pauseButton);
     },
 
@@ -94,6 +106,7 @@ Game.Game.prototype = {
     },
 
     createNewGame: function() {
+        this.resetJuice();
         this.createBoard();
         this.createAskPiece();
     },
@@ -290,7 +303,7 @@ Game.Game.prototype = {
                 boardPieces[xCheck][yCheck].destroy();
                 boardPieces[xCheck][yCheck] = null;
                 boardPiecesCount--;
-                // Increase collected juice count
+                this.addJuice();
             }
         }
 
@@ -320,6 +333,16 @@ Game.Game.prototype = {
 
         askSlot.tint = startColor;
         colorTween.start();
+    },
+
+    resetJuice: function() {
+        juiceCount = 0;
+        juiceText.text = juiceCount.toString();
+    },
+
+    addJuice: function() {
+        juiceCount++;
+        juiceText.text = juiceCount.toString();
     },
 
     generateEmptyPiece: function(orientation) {
@@ -487,6 +510,7 @@ Game.Game.prototype = {
 
     restart: function() {
         this.createNewGame();
+        this.resume();
     },
 
     quit: function() {
