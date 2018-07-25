@@ -35,8 +35,10 @@ var pauseMenu;
 var gameInputEnabledUI;
 
 Game.Game.prototype = {
-    init: function(level) {
-        this.level = level;
+    init: function(levelNumber) {
+        if (levelNumber != null) {
+            level = levelNumber;
+        }
     },
 
     preload: function() {
