@@ -3,7 +3,7 @@ Game.Game = function(game) {
 }
 
 // Current level
-var level = 3;
+var level = 1;
 var levelData;
 var juiceCount = 0;
 var juiceText;
@@ -33,6 +33,11 @@ var gameUI;
 var pauseMenu;
 var loseScreen;
 var winScreen;
+// Win screen object reference
+var winStar1;
+var winStar2;
+var winStar3;
+var progress;
 // Input enabled Game UI array
 var gameInputEnabledUI;
 
@@ -161,7 +166,7 @@ Game.Game.prototype = {
         loseScreen = game.add.group();
 
         var background = game.add.image(game.world.width / 2, 600, 'result_lose');
-        var levelText = game.add.text(game.world.width / 2, 420, "LEVEL " + level.toString()); console.log(level);
+        var levelText = game.add.text(game.world.width / 2, 420, "LEVEL " + level.toString());
         var starEmpty = game.add.image(230, 550, 'result_star_empty');
         var starEmpty2 = game.add.image(360, 550, 'result_star_empty');
         var starEmpty3 = game.add.image(490, 550, 'result_star_empty');
@@ -206,7 +211,58 @@ Game.Game.prototype = {
     },
 
     createWinScreen: function() {
+        winScreen = game.add.group();
 
+        var background = game.add.image(game.world.width / 2, 600, 'result_win');
+        var levelText = game.add.text(game.world.width / 2, 430, "LEVEL " + level.toString());
+        var starEmpty = game.add.image(230, 550, 'result_star_empty');
+        var starEmpty2 = game.add.image(360, 550, 'result_star_empty');
+        var starEmpty3 = game.add.image(490, 550, 'result_star_empty');
+        winStar1 = game.add.image(230, 550, 'result_star');
+        winStar2 = game.add.image(360, 550, 'result_star');
+        winStar3 = game.add.image(490, 550, 'result_star');
+        progress = game.add.sprite(game.world.width / 2, 690, 'result_progress_1to2');
+        var restartButton = game.add.image(220, 800, 'result_restart');
+        var nextLevelButton = game.add.image(360, 800, 'result_continue');
+        var levelButton = game.add.image(500, 800, 'result_level');
+
+        background.anchor.set(0.5);
+
+        levelText.anchor.set(0.5);
+        levelText.font = "Poplar";
+        levelText.fontSize = "35px";
+        levelText.fontWeight = "Bold";
+        levelText.fill = "#ffff00";
+        levelText.stroke = "#cc6600";
+        levelText.strokeThickness = 3;
+        levelText.align = "center";
+
+        starEmpty.anchor.set(0.5);
+        starEmpty2.anchor.set(0.5);
+        starEmpty3.anchor.set(0.5);
+        winStar1.anchor.set(0.5);
+        winStar1.visible = false;
+        winStar2.anchor.set(0.5);
+        winStar2.visible = false;
+        winStar3.anchor.set(0.5);
+        winStar3.visible = false;
+
+        progress.anchor.set(0.5);
+
+        restartButton.anchor.set(0.5);
+        restartButton.inputEnabled = true;
+        restartButton.events.onInputDown.add(this.restart, this);
+
+        nextLevelButton.anchor.set(0.5);
+        nextLevelButton.inputEnabled = true;
+        nextLevelButton.events.onInputDown.add(this.nextLevel, this);
+
+        levelButton.anchor.set(0.5);
+        levelButton.inputEnabled = true;
+        levelButton.events.onInputDown.add(this.levelSelect, this);
+
+        winScreen.addMultiple([background, levelText, starEmpty, starEmpty2, starEmpty3, winStar1, winStar2, winStar3, progress, restartButton, nextLevelButton, levelButton]);
+        winScreen.visible = false;
     },
 
     createNewGame: function() {
@@ -590,7 +646,7 @@ Game.Game.prototype = {
     },
 
     checkWin: function() {
-        if (juiceCount < juiceTarget) {
+        if (juiceCount < juiceTarget[0]) {
             this.loseGame();
         }
         else {
@@ -607,7 +663,36 @@ Game.Game.prototype = {
     },
 
     winGame: function() {
-        console.log("Win Game");
+        this.freezeGame();
+
+        // Show Win Screen
+        winScreen.visible = true;
+        game.world.bringToTop(winScreen);
+
+        // Calculate stars
+        var stars = 0;
+        for (var i = 0; i < juiceTarget.length; i++) {
+            if (juiceCount >= juiceTarget[i]) {
+                stars++;
+            }
+        }
+
+        // Show stars and play animation
+        if (stars == 1) {
+            // Don't need to play animation
+            winStar1.visible = true;
+        }
+        else if (stars == 2) {
+            // Play animation to 2 juices
+            winStar1.visible = true;
+            winStar2.visible = true;
+        }
+        else if (stars == 3) {
+            // Play animationf to 3 juices
+            winStar1.visible = true;
+            winStar2.visible = true;
+            winStar3.visible = true;
+        }
     },
 
     freezeGame: function() {
@@ -649,16 +734,22 @@ Game.Game.prototype = {
         timer.resume();
 
         this.unfreezeGame();
-
-        // Hide Pause Menu
-        pauseMenu.visible = false;
-        // Hide Lose Screen
-        loseScreen.visible = false;
     },
 
     restart: function() {
         this.createNewGame();
         this.resume();
+
+        // Hide Pause Menu
+        pauseMenu.visible = false;
+        // Hide Lose Screen
+        loseScreen.visible = false;
+        // Hide Win Screen
+        winScreen.visible = false;
+    },
+
+    nextLevel: function() {
+        game.state.start('game', true, false, level + 1);
     },
 
     levelSelect: function() {
