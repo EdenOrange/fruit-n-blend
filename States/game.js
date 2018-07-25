@@ -303,7 +303,23 @@ Game.Game.prototype = {
     },
 
     wrongAnswer: function(x, y) {
-        console.log('Wrong Answer');
+        this.playWrongAnim(askSlots[x][y]);
+        // Time penalty
+    },
+
+    playWrongAnim: function(askSlot) {
+        var startColor = "0xff0000";
+        var endColor = "0xffffff";
+        var duration = 2000;
+
+        var colorBlend = {step: 0};
+        var colorTween = game.add.tween(colorBlend).to({step: 100}, duration);
+        colorTween.onUpdateCallback(function(){
+            askSlot.tint = Phaser.Color.interpolateColor(startColor, endColor, 100, colorBlend.step);
+        });
+
+        askSlot.tint = startColor;
+        colorTween.start();
     },
 
     generateEmptyPiece: function(orientation) {
