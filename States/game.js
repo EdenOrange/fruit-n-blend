@@ -56,7 +56,7 @@ Game.Game.prototype = {
         var timeLeft = timeLimit - timer.seconds - timePenalty;
         if (timeLeft <= 0) {
             timer.stop();
-            this.loseGame();
+            this.checkWin();
         }
         if (timer.running) {
             var minutes = "0" + Math.floor(Math.round(timeLeft) / 60);
@@ -171,8 +171,13 @@ Game.Game.prototype = {
     createBoard: function() {
         // Clear board
         for (var i = 0; i < board.settings[boardSetting].size; i++) {
-            boardPieces[i] = [];
+            if (boardPieces[i] == null) {
+                boardPieces[i] = [];
+            }
             for (var j = 0; j < board.settings[boardSetting].size; j++) {
+                if (boardPieces[i][j] != null) {
+                    boardPieces[i][j].destroy();
+                }
                 boardPieces[i][j] = null;
             }
         }
@@ -524,6 +529,15 @@ Game.Game.prototype = {
         }
         var randomPiece = activePieces[Math.floor(Math.random() * activePieces.length)];
         return randomPiece;
+    },
+
+    checkWin: function() {
+        if (juiceCount < juiceTarget) {
+            this.loseGame();
+        }
+        else {
+            this.winGame();
+        }
     },
 
     loseGame: function() {
