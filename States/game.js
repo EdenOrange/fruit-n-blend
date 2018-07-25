@@ -9,18 +9,18 @@ var level = 1;
 var board;
 // Board pieces holder
 var boardPieces = [];
+var boardPiecesCount;
 // Board pieces
 var pieceShapes = [];
 var pieceColors = [];
 // Current ask piece
-var askPiece;
+var askPiece = null;
 // Ask slots holder
 var askSlots = [];
 
 // UI groups
 var gameUI;
 var pauseMenu;
-var askSlotsUI;
 // Input enabled Game UI array
 var gameInputEnabledUI;
 
@@ -96,7 +96,6 @@ Game.Game.prototype = {
     createNewGame: function() {
         this.createBoard();
         this.createAskPiece();
-        this.drawAskSlots();
     },
 
     setupPieces: function() {
@@ -114,6 +113,7 @@ Game.Game.prototype = {
                 boardPieces[i][j] = null;
             }
         }
+        boardPiecesCount = 0;
         // Create a new board
         var arrangements = board.arrangements[1][Math.floor(Math.random() * board.arrangements[1].length)];
         for (var i = 0; i < arrangements.length; i++) {
@@ -140,12 +140,19 @@ Game.Game.prototype = {
             piece.scale.set(board.settings[1].scale);
 
             boardPieces[x][y] = piece;
+            boardPiecesCount++;
 
             gameUI.add(piece);
         }
     },
 
     createAskPiece: function() {
+        // Clear current askPiece if exists
+        if (askPiece != null) {
+            askPiece.destroy();
+            askPiece = null;
+        }
+
         var targetPiece = this.getRandomPiece();
         var askPieceString = null;
         while (askPieceString == null) {
@@ -160,17 +167,24 @@ Game.Game.prototype = {
         askPiece.scale.set(board.settings[1].scale);
 
         gameUI.add(askPiece);
+        
+        this.drawAskSlots();
     },
 
     drawAskSlots: function() {
         // Clear ask slots
         for (var i = 0; i < board.settings[1].size; i++) {
-            askSlots[i] = [];
+            if (askSlots[i] == null) {
+                askSlots[i] = [];
+            }
             for (var j = 0; j < board.settings[1].size; j++) {
+                if (askSlots[i][j] != null) {
+                    // Destroy and remove existing ask slot
+                    gameUI.remove(askSlots[i][j], true);
+                }
                 askSlots[i][j] = null;
             }
         }
-        askSlotsUI = game.add.group();
 
         // Draw each valid ask slots
         for (var i = 0; i < board.settings[1].size; i++) {
@@ -189,8 +203,8 @@ Game.Game.prototype = {
                 ];
                 if (boardPieces[i][j] != null) {
                     for (var k = 0; k < checkPos.length; k++) {
-                        xCheck = checkPos[k].x;
-                        yCheck = checkPos[k].y;
+                        let xCheck = checkPos[k].x;
+                        let yCheck = checkPos[k].y;
                         // Ask slots and board piece occupied check
                         if (askSlots[xCheck][yCheck] != null || boardPieces[xCheck][yCheck] != null) {
                             continue;
@@ -204,15 +218,92 @@ Game.Game.prototype = {
                         var boardX = board.settings[1].start.x + board.settings[1].margin.x * xCheck;
                         var boardY = board.settings[1].start.y + board.settings[1].margin.y * yCheck;
                         var askSlot = game.add.image(boardX, boardY, this.generateEmptyPiece(askPiece.orientation));
-
                         askSlot.anchor.set(0.5);
                         askSlot.scale.set(board.settings[1].scale);
+                        askSlot.inputEnabled = true;
+                        askSlot.events.onInputDown.add(function(){this.checkAnswer(xCheck, yCheck)}, this);
 
-                        askSlotsUI.add(askSlot);
+                        askSlots[xCheck][yCheck] = askSlot;
+
+                        gameUI.add(askSlot);
                     }
                 }
             }
         }
+    },
+
+    checkAnswer: function(x, y) {
+        var checkPos = [
+            {x: x, y: y-1},
+            {x: x, y: y+1},
+            {x: x-1, y: y},
+            {x: x+1, y: y}
+        ];
+        var surroundings = [];
+
+        // Push surroundings to array
+        for (var i = 0; i < checkPos.length; i++) {
+            var xCheck = checkPos[i].x;
+            var yCheck = checkPos[i].y;
+            // Board boundaries check
+            if (xCheck < 0 || xCheck >= board.settings[1].size || yCheck < 0 || yCheck >= board.settings[1].size) {
+                continue;
+            }
+
+            if (boardPieces[xCheck][yCheck] != null) {
+                if (askPiece.orientation == 'h') {
+                    surroundings.push(boardPieces[xCheck][yCheck].shape);
+                }
+                else {
+                    surroundings.push(boardPieces[xCheck][yCheck].color);
+                }
+            }
+        }
+
+        // Checks if surroundings have the same shape/color as askPiece (correct answer)
+        if (surroundings.every((val, i, arr) => val == ((askPiece.orientation == 'h') ? askPiece.shape : askPiece.color))) {
+            this.correctAnswer(x, y);
+        }
+        else {
+            this.wrongAnswer(x, y);
+        }
+    },
+
+    correctAnswer: function(x, y) {
+        var checkPos = [
+            {x: x, y: y-1},
+            {x: x, y: y+1},
+            {x: x-1, y: y},
+            {x: x+1, y: y}
+        ];
+
+        // Destroy surrounding board pieces
+        for (var i = 0; i < checkPos.length; i++) {
+            var xCheck = checkPos[i].x;
+            var yCheck = checkPos[i].y;
+            // Board boundaries check
+            if (xCheck < 0 || xCheck >= board.settings[1].size || yCheck < 0 || yCheck >= board.settings[1].size) {
+                continue;
+            }
+            
+            if (boardPieces[xCheck][yCheck] != null) {
+                boardPieces[xCheck][yCheck].destroy();
+                boardPieces[xCheck][yCheck] = null;
+                boardPiecesCount--;
+                // Increase collected juice count
+            }
+        }
+
+        // Check if new board needs to be created
+        if (boardPiecesCount == 0) {
+            this.createBoard();
+        }
+
+        this.createAskPiece();
+    },
+
+    wrongAnswer: function(x, y) {
+        console.log('Wrong Answer');
     },
 
     generateEmptyPiece: function(orientation) {
