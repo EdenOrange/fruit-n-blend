@@ -2,7 +2,7 @@ Game.LevelSelect = function(game) {
 
 }
 
-var levelsUnlocked = 3;
+var levelsUnlocked;
 
 var juiceStartX = 165;
 var juiceStartY = 420;
@@ -18,6 +18,13 @@ Game.LevelSelect.prototype = {
         title.anchor.set(0.5);
 
         page.anchor.set(0.5);
+
+        // Get levels unlocked from local storage
+        levelsUnlocked = localStorage.getItem('levelsUnlocked');
+        if (levelsUnlocked == null) {
+            localStorage.setItem('levelsUnlocked', 1);
+            levelsUnlocked = 1;
+        }
 
         // Add juices
         for (let i = 0; i < 8; i++) {
