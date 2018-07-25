@@ -4,8 +4,10 @@ Game.Game = function(game) {
 
 // Current level
 var level = 1;
+var levelData;
 var juiceCount = 0;
 var juiceText;
+var juiceTarget;
 var timer;
 var timeLimit = 30;
 var timePenalty = 0;
@@ -13,6 +15,8 @@ var timeText;
 
 // Board settings
 var board;
+var boardSize;
+var boardSetting; // 0: size=4, 1: size=5
 // Board pieces holder
 var boardPieces = [];
 var boardPiecesCount;
@@ -37,9 +41,11 @@ Game.Game.prototype = {
 
     preload: function() {
         board = game.cache.getJSON('board');
+        levelData = game.cache.getJSON('levelData');
     },
 
     create: function() {
+        this.applyLevelSettings(level - 1);
         this.createGameUI();
         this.createPauseMenu();
         this.setupPieces();
@@ -57,6 +63,19 @@ Game.Game.prototype = {
             var seconds = "0" + (Math.round(timeLeft) - minutes * 60);
             timeText.text = minutes.substr(-1) + ":" + seconds.substr(-2);
         }
+    },
+
+    applyLevelSettings: function(level) {
+        boardSize = levelData.settings[level].size;
+        if (boardSize == 4) {
+            boardSetting = 0;
+        }
+        else if (boardSize == 5) {
+            boardSetting = 1;
+        }
+
+        juiceTarget = levelData.settings[level].juice;
+        timeLimit = levelData.settings[level].time;
     },
 
     createGameUI: function() {
@@ -151,20 +170,20 @@ Game.Game.prototype = {
 
     createBoard: function() {
         // Clear board
-        for (var i = 0; i < board.settings[1].size; i++) {
+        for (var i = 0; i < board.settings[boardSetting].size; i++) {
             boardPieces[i] = [];
-            for (var j = 0; j < board.settings[1].size; j++) {
+            for (var j = 0; j < board.settings[boardSetting].size; j++) {
                 boardPieces[i][j] = null;
             }
         }
         boardPiecesCount = 0;
         // Create a new board
-        var arrangements = board.arrangements[1][Math.floor(Math.random() * board.arrangements[1].length)];
+        var arrangements = board.arrangements[boardSetting][Math.floor(Math.random() * board.arrangements[boardSetting].length)];
         for (var i = 0; i < arrangements.length; i++) {
             var x = arrangements[i].x;
             var y = arrangements[i].y;
-            var boardX = board.settings[1].start.x + board.settings[1].margin.x * x;
-            var boardY = board.settings[1].start.y + board.settings[1].margin.y * y;
+            var boardX = board.settings[boardSetting].start.x + board.settings[boardSetting].margin.x * x;
+            var boardY = board.settings[boardSetting].start.y + board.settings[boardSetting].margin.y * y;
             var piece;
             if ((x + y) % 2 == 0) {
                 var randomPiece = this.generateRandomPiece('h', false);
@@ -181,7 +200,7 @@ Game.Game.prototype = {
             piece.xPos = x;
             piece.yPos = y;
             piece.anchor.set(0.5);
-            piece.scale.set(board.settings[1].scale);
+            piece.scale.set(board.settings[boardSetting].scale);
 
             boardPieces[x][y] = piece;
             boardPiecesCount++;
@@ -202,13 +221,13 @@ Game.Game.prototype = {
         while (askPieceString == null) {
             askPieceString = this.generateAskPiece(targetPiece.xPos, targetPiece.yPos);
         } 
-        askPiece = game.add.image(board.settings[1].ask.x, board.settings[1].ask.y, askPieceString);
+        askPiece = game.add.image(board.settings[boardSetting].ask.x, board.settings[boardSetting].ask.y, askPieceString);
         var pieceSplit = askPiece.key.split('_');
         askPiece.shape = pieceSplit[1];
         askPiece.color = pieceSplit[2];
         askPiece.orientation = pieceSplit[3];
         askPiece.anchor.set(0.5);
-        askPiece.scale.set(board.settings[1].scale);
+        askPiece.scale.set(board.settings[boardSetting].scale);
 
         gameUI.add(askPiece);
         
@@ -217,11 +236,11 @@ Game.Game.prototype = {
 
     drawAskSlots: function() {
         // Clear ask slots
-        for (var i = 0; i < board.settings[1].size; i++) {
+        for (var i = 0; i < board.settings[boardSetting].size; i++) {
             if (askSlots[i] == null) {
                 askSlots[i] = [];
             }
-            for (var j = 0; j < board.settings[1].size; j++) {
+            for (var j = 0; j < board.settings[boardSetting].size; j++) {
                 if (askSlots[i][j] != null) {
                     // Destroy and remove existing ask slot
                     gameUI.remove(askSlots[i][j], true);
@@ -231,8 +250,8 @@ Game.Game.prototype = {
         }
 
         // Draw each valid ask slots
-        for (var i = 0; i < board.settings[1].size; i++) {
-            for (var j = 0; j < board.settings[1].size; j++) {
+        for (var i = 0; i < board.settings[boardSetting].size; i++) {
+            for (var j = 0; j < board.settings[boardSetting].size; j++) {
                 // Orientation check
                 // Ask piece orientation != Board piece orientation
                 if (((i + j) % 2 == 0 && askPiece.orientation == 'h') || ((i + j) % 2 != 0 && askPiece.orientation == 'v')) {
@@ -249,21 +268,21 @@ Game.Game.prototype = {
                     for (var k = 0; k < checkPos.length; k++) {
                         let xCheck = checkPos[k].x;
                         let yCheck = checkPos[k].y;
+                        // Board boundaries check
+                        if (xCheck < 0 || xCheck >= board.settings[boardSetting].size || yCheck < 0 || yCheck >= board.settings[boardSetting].size) {
+                            continue;
+                        }
                         // Ask slots and board piece occupied check
                         if (askSlots[xCheck][yCheck] != null || boardPieces[xCheck][yCheck] != null) {
                             continue;
                         }
-                        // Board boundaries check
-                        if (xCheck < 0 || xCheck >= board.settings[1].size || yCheck < 0 || yCheck >= board.settings[1].size) {
-                            continue;
-                        }
 
                         // Draw ask slot on xCheck, yCheck
-                        var boardX = board.settings[1].start.x + board.settings[1].margin.x * xCheck;
-                        var boardY = board.settings[1].start.y + board.settings[1].margin.y * yCheck;
+                        var boardX = board.settings[boardSetting].start.x + board.settings[boardSetting].margin.x * xCheck;
+                        var boardY = board.settings[boardSetting].start.y + board.settings[boardSetting].margin.y * yCheck;
                         var askSlot = game.add.image(boardX, boardY, this.generateEmptyPiece(askPiece.orientation));
                         askSlot.anchor.set(0.5);
-                        askSlot.scale.set(board.settings[1].scale);
+                        askSlot.scale.set(board.settings[boardSetting].scale);
                         askSlot.inputEnabled = true;
                         askSlot.events.onInputDown.add(function(){this.checkAnswer(xCheck, yCheck)}, this);
 
@@ -290,7 +309,7 @@ Game.Game.prototype = {
             var xCheck = checkPos[i].x;
             var yCheck = checkPos[i].y;
             // Board boundaries check
-            if (xCheck < 0 || xCheck >= board.settings[1].size || yCheck < 0 || yCheck >= board.settings[1].size) {
+            if (xCheck < 0 || xCheck >= board.settings[boardSetting].size || yCheck < 0 || yCheck >= board.settings[boardSetting].size) {
                 continue;
             }
 
@@ -326,7 +345,7 @@ Game.Game.prototype = {
             var xCheck = checkPos[i].x;
             var yCheck = checkPos[i].y;
             // Board boundaries check
-            if (xCheck < 0 || xCheck >= board.settings[1].size || yCheck < 0 || yCheck >= board.settings[1].size) {
+            if (xCheck < 0 || xCheck >= board.settings[boardSetting].size || yCheck < 0 || yCheck >= board.settings[boardSetting].size) {
                 continue;
             }
             
@@ -433,7 +452,7 @@ Game.Game.prototype = {
                 var xCheck = checkPos[j].x;
                 var yCheck = checkPos[j].y;
                 // Board boundaries check
-                if (xCheck < 0 || xCheck >= board.settings[1].size || yCheck < 0 || yCheck >= board.settings[1].size) {
+                if (xCheck < 0 || xCheck >= board.settings[boardSetting].size || yCheck < 0 || yCheck >= board.settings[boardSetting].size) {
                     continue;
                 }
 
@@ -496,8 +515,8 @@ Game.Game.prototype = {
     getRandomPiece: function() {
         // Returns a random active board piece
         var activePieces = [];
-        for (var i = 0; i < board.settings[1].size; i++) {
-            for (var j = 0; j < board.settings[1].size; j++) {
+        for (var i = 0; i < board.settings[boardSetting].size; i++) {
+            for (var j = 0; j < board.settings[boardSetting].size; j++) {
                 if (boardPieces[i][j]) {
                     activePieces.push(boardPieces[i][j]);
                 }

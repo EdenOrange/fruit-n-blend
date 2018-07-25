@@ -75,6 +75,9 @@ Game.Load.prototype = {
         // Game - Board
         game.load.json('board', 'Data/board.json');
 
+        // Game - Level Data
+        game.load.json('levelData', 'Data/level.json');
+
         // Game - Pause
         game.load.image('pause_background', 'Assets/Game/Pause/pause.png');
         game.load.image('pause_quit', 'Assets/Game/Pause/quit.png');
