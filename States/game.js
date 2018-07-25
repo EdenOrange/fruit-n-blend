@@ -3,7 +3,7 @@ Game.Game = function(game) {
 }
 
 // Current level
-var level = 1;
+var level = 3;
 var levelData;
 var juiceCount = 0;
 var juiceText;
@@ -31,6 +31,8 @@ var askSlots = [];
 // UI groups
 var gameUI;
 var pauseMenu;
+var loseScreen;
+var winScreen;
 // Input enabled Game UI array
 var gameInputEnabledUI;
 
@@ -50,6 +52,8 @@ Game.Game.prototype = {
         this.applyLevelSettings(level - 1);
         this.createGameUI();
         this.createPauseMenu();
+        this.createLoseScreen();
+        this.createWinScreen();
         this.setupPieces();
         this.createNewGame();
     },
@@ -151,6 +155,58 @@ Game.Game.prototype = {
 
         pauseMenu.addMultiple([background, resumeButton, restartButton, quitButton]);
         pauseMenu.visible = false;
+    },
+
+    createLoseScreen: function() {
+        loseScreen = game.add.group();
+
+        var background = game.add.image(game.world.width / 2, 600, 'result_lose');
+        var levelText = game.add.text(game.world.width / 2, 420, "LEVEL " + level.toString()); console.log(level);
+        var starEmpty = game.add.image(230, 550, 'result_star_empty');
+        var starEmpty2 = game.add.image(360, 550, 'result_star_empty');
+        var starEmpty3 = game.add.image(490, 550, 'result_star_empty');
+        var commentText = game.add.text(game.world.width / 2, 670, "LEVEL NOT PASSED");
+        var restartButton = game.add.image(260, 780, 'result_restart');
+        var levelButton = game.add.image(460, 780, 'result_level');
+
+        background.anchor.set(0.5);
+
+        levelText.anchor.set(0.5);
+        levelText.font = "Poplar";
+        levelText.fontSize = "35px";
+        levelText.fontWeight = "Bold";
+        levelText.fill = "#ffff00";
+        levelText.stroke = "#cc6600";
+        levelText.strokeThickness = 3;
+        levelText.align = "center";
+
+        starEmpty.anchor.set(0.5);
+        starEmpty2.anchor.set(0.5);
+        starEmpty3.anchor.set(0.5);
+
+        commentText.anchor.set(0.5);
+        commentText.font = "Poplar";
+        commentText.fontSize = "35px";
+        commentText.fontWeight = "Bold";
+        commentText.fill = "#ffffff";
+        commentText.stroke = "#0000ff";
+        commentText.strokeThickness = 3;
+        commentText.align = "center";
+
+        restartButton.anchor.set(0.5);
+        restartButton.inputEnabled = true;
+        restartButton.events.onInputDown.add(this.restart, this);
+
+        levelButton.anchor.set(0.5);
+        levelButton.inputEnabled = true;
+        levelButton.events.onInputDown.add(this.levelSelect, this);
+
+        loseScreen.addMultiple([background, levelText, starEmpty, starEmpty2, starEmpty3, commentText, restartButton, levelButton]);
+        loseScreen.visible = false;
+    },
+
+    createWinScreen: function() {
+
     },
 
     createNewGame: function() {
@@ -543,16 +599,18 @@ Game.Game.prototype = {
     },
 
     loseGame: function() {
-        console.log("Lose Game");
+        this.freezeGame();
+
+        // Show Lose Screen
+        loseScreen.visible = true;
+        game.world.bringToTop(loseScreen);
     },
 
     winGame: function() {
         console.log("Win Game");
     },
 
-    pause: function() {
-        timer.pause();
-
+    freezeGame: function() {
         // Add gray filter to Game UI
         var grayFilter = game.add.filter('Gray');
         gameUI.filters = [grayFilter];
@@ -563,15 +621,9 @@ Game.Game.prototype = {
         gameInputEnabledUI.forEach(function (object) {
             object.inputEnabled = false;
         });
-
-        // Show Pause Menu
-        pauseMenu.visible = true;
-        game.world.bringToTop(pauseMenu);
     },
 
-    resume: function() {
-        timer.resume();
-
+    unfreezeGame: function() {
         // Remove gray filter from Game UI
         gameUI.filters = null;
         // Lighten back up Game UI
@@ -581,14 +633,36 @@ Game.Game.prototype = {
         gameInputEnabledUI.forEach(function (object) {
             object.inputEnabled = true;
         });
+    },
+
+    pause: function() {
+        timer.pause();
+
+        this.freezeGame();
+
+        // Show Pause Menu
+        pauseMenu.visible = true;
+        game.world.bringToTop(pauseMenu);
+    },
+
+    resume: function() {
+        timer.resume();
+
+        this.unfreezeGame();
 
         // Hide Pause Menu
         pauseMenu.visible = false;
+        // Hide Lose Screen
+        loseScreen.visible = false;
     },
 
     restart: function() {
         this.createNewGame();
         this.resume();
+    },
+
+    levelSelect: function() {
+        game.state.start('levelSelect');
     },
 
     quit: function() {
