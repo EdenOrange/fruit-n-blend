@@ -5,7 +5,7 @@ Game.HighScore = function(game) {
 Game.HighScore.prototype = {
     create: function() {
         var background = game.add.image(0, 0, 'highscore_background');
-        var title = game.add.image(game.world.width / 2, 100, 'highscore_title');
+        var title = game.add.image(game.world.width / 2, 80, 'highscore_title');
         var page = game.add.image(game.world.width / 2, 600, 'highscore_page');
         var levelButton = game.add.image(game.world.width / 2, 900, 'highscore_level');
 
@@ -30,7 +30,7 @@ Game.HighScore.prototype = {
         for (var i = 0; i < highScore.length; i++) {
             var highScoreRank = [];
             var y = yStart + yMargin * i;
-            highScoreRank[0] = game.add.text(xRank, y, (i + 1).toString()); console.log(highScoreRank[0]);
+            highScoreRank[0] = game.add.text(xRank, y, (i + 1).toString());
             highScoreRank[1] = game.add.text(xJuiceCount, y, highScore[i].juice);
             var juice = game.add.image(xJuice, y, 'highscore_juice');
             highScoreRank[2] = game.add.text(xDate, y, highScore[i].date);
