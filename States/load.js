@@ -92,8 +92,7 @@ Game.Load.prototype = {
         game.load.image('result_lose', 'Assets/Game/Result/lose.png');
         game.load.image('result_star', 'Assets/Game/Result/star.png');
         game.load.image('result_star_empty', 'Assets/Game/Result/star kosong.png');
-        game.load.spritesheet('result_progress_1to2', 'Assets/Game/Result/spritesheet1.png', 407.7, 111, 6);
-        game.load.spritesheet('result_progress_2to3', 'Assets/Game/Result/spritesheet2.png', 406, 112, 4);
+        game.load.spritesheet('result_progress', 'Assets/Game/Result/highscore spritesheet.png', 864 / 2, 550 / 5, 9);
         game.load.image('result_level', 'Assets/Game/Result/level.png');
         game.load.image('result_continue', 'Assets/Game/Result/continue.png');
         game.load.image('result_restart', 'Assets/Game/Result/restart.png');

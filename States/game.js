@@ -67,7 +67,7 @@ Game.Game.prototype = {
 
     update: function() {
         var timeLeft = timeLimit - timer.seconds - timePenalty;
-        if (timeLeft <= 0) {
+        if (timeLeft <= 0 && !timer.paused) {
             timer.pause();
             this.checkWin();
         }
@@ -234,7 +234,7 @@ Game.Game.prototype = {
         winStar1 = game.add.image(230, 550, 'result_star');
         winStar2 = game.add.image(360, 550, 'result_star');
         winStar3 = game.add.image(490, 550, 'result_star');
-        progress = game.add.sprite(game.world.width / 2, 690, 'result_progress_1to2');
+        progress = game.add.sprite(game.world.width / 2, 690, 'result_progress');
         var restartButton = game.add.image(220, 800, 'result_restart');
         var nextLevelButton = game.add.image(360, 800, 'result_continue');
         var levelButton = game.add.image(500, 800, 'result_level');
@@ -261,6 +261,9 @@ Game.Game.prototype = {
         winStar3.visible = false;
 
         progress.anchor.set(0.5);
+        progress.animations.add('1star', [0, 1], 10, false);
+        progress.animations.add('2star', [0, 1, 2, 3, 4]), 10, false;
+        progress.animations.add('3star', null, 10, false);
 
         restartButton.anchor.set(0.5);
         restartButton.inputEnabled = true;
@@ -560,6 +563,18 @@ Game.Game.prototype = {
         blenderAnim.play(15, true, false);
     },
 
+    playProgressAnim: function(targetStar) {
+        if (targetStar == 1) {
+            progress.animations.play('1star');
+        }
+        else if (targetStar == 2) {
+            progress.animations.play('2star');
+        }
+        else if (targetStar == 3) {
+            progress.animations.play('3star');
+        }
+    },
+
     resetJuice: function() {
         juiceCount = 0;
         juiceText.text = juiceCount.toString();
@@ -740,20 +755,26 @@ Game.Game.prototype = {
         }
 
         // Show stars and play animation
+        winStar1.visible = false;
+        winStar2.visible = false;
+        winStar3.visible = false;
         if (stars == 1) {
-            // Don't need to play animation
+            // Play animation to 1 juice
             winStar1.visible = true;
+            this.playProgressAnim(1);
         }
         else if (stars == 2) {
             // Play animation to 2 juices
             winStar1.visible = true;
             winStar2.visible = true;
+            this.playProgressAnim(2);
         }
         else if (stars == 3) {
             // Play animation to 3 juices
             winStar1.visible = true;
             winStar2.visible = true;
             winStar3.visible = true;
+            this.playProgressAnim(3);
         }
 
         // Store highScore
