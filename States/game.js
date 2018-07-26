@@ -66,14 +66,21 @@ Game.Game.prototype = {
     update: function() {
         var timeLeft = timeLimit - timer.seconds - timePenalty;
         if (timeLeft <= 0) {
-            timer.stop();
+            timer.pause();
             this.checkWin();
         }
+
+        var minutes;
+        var seconds;
+        
         if (timer.running) {
-            var minutes = "0" + Math.floor(Math.round(timeLeft) / 60);
-            var seconds = "0" + (Math.round(timeLeft) - minutes * 60);
-            timeText.text = minutes.substr(-1) + ":" + seconds.substr(-2);
+            minutes = "0" + Math.floor(Math.ceil(timeLeft) / 60);
+            seconds = "0" + (Math.ceil(timeLeft) - minutes * 60);
+        } else {
+            minutes = "0" + Math.floor(Math.ceil(timeLimit) / 60);
+            seconds = "0" + (Math.ceil(timeLimit) - minutes * 60);
         }
+        timeText.text = minutes.substr(-1) + ":" + seconds.substr(-2);
     },
 
     applyLevelSettings: function(level) {
@@ -269,10 +276,28 @@ Game.Game.prototype = {
         this.resetJuice();
         this.createBoard();
         this.createAskPiece();
-
         timer = game.time.create(false);
         timePenalty = 0;
-        timer.start();
+        this.createCountdown();
+    },
+
+    createCountdown: function() {
+        this.freezeGame();
+        var countdown = 3;
+        var style = {font: "110px Poplar", fontWeight: "Bold", fill: "#ffffff", stroke: "#000000", strokeThickness: 5, align: "center"};
+        var countdownText = game.add.text(game.world.centerX, game.world.centerY, countdown.toString(), style);
+        countdownText.anchor.set(0.5);
+        var countdownTween = game.add.tween(countdownText).to({alpha: 0, fontSize: "140px"}, 1000, Phaser.Easing.Linear.None, true, 0, 2);
+        countdownTween.onRepeat.add(function() {
+            countdown--;
+            countdownText.text = countdown.toString();
+            countdownText.alpha = 1;
+            countdownText.fontSize = "110px";
+        })
+        countdownTween.onComplete.add(function() {
+            timer.start();
+            this.unfreezeGame();
+        }, this);
     },
 
     setupPieces: function() {
@@ -772,8 +797,8 @@ Game.Game.prototype = {
     },
 
     restart: function() {
-        this.createNewGame();
         this.resume();
+        this.createNewGame();
 
         // Hide Lose Screen
         loseScreen.visible = false;
