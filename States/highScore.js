@@ -4,7 +4,7 @@ Game.HighScore = function(game) {
 
 Game.HighScore.prototype = {
     create: function() {
-        var background = game.add.image(0, 0, 'highscore_background');
+        var background = game.add.image(-3, 0, 'highscore_background');
         var title = game.add.image(game.world.width / 2, 80, 'highscore_title');
         var page = game.add.image(game.world.width / 2, 600, 'highscore_page');
         var levelButton = game.add.image(game.world.width / 2, 900, 'highscore_level');

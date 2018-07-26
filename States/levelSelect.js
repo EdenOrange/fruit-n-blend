@@ -11,7 +11,7 @@ var juiceMarginY = 215;
 
 Game.LevelSelect.prototype = {
     create: function() {
-        var background = game.add.image(0, 0, 'level_background');
+        var background = game.add.image(-3, 0, 'level_background');
         var title = game.add.image(game.world.width / 2, 100, 'level_title');
         var page = game.add.image(game.world.width / 2, 600, 'level_page');
 

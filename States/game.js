@@ -93,7 +93,7 @@ Game.Game.prototype = {
         gameUI = game.add.group();
         gameInputEnabledUI = [];
 
-        var background = game.add.image(0, 0, 'game_background');
+        var background = game.add.image(-1.5, 0.5, 'game_background');
         var blender = game.add.image(250, 420, 'game_blender');
         var fruitBasket = game.add.image(580, 480, 'game_fruit_basket');
         var juice = game.add.image(160, 35, 'game_juice');
