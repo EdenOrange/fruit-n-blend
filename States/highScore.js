@@ -7,7 +7,7 @@ Game.HighScore.prototype = {
         var background = game.add.image(-3, 0, 'highscore_background');
         var title = game.add.image(game.world.width / 2, 80, 'highscore_title');
         var page = game.add.image(game.world.width / 2, 600, 'highscore_page');
-        var levelButton = game.add.image(game.world.width / 2, 900, 'highscore_level');
+        var levelButton = game.add.image(game.world.width / 2, 880, 'highscore_level');
 
         title.anchor.set(0.5);
 

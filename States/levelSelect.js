@@ -14,10 +14,15 @@ Game.LevelSelect.prototype = {
         var background = game.add.image(-3, 0, 'level_background');
         var title = game.add.image(game.world.width / 2, 100, 'level_title');
         var page = game.add.image(game.world.width / 2, 600, 'level_page');
+        var highScoreButton = game.add.image(game.world.width / 2, 880, 'level_highscore');
 
         title.anchor.set(0.5);
 
         page.anchor.set(0.5);
+
+        highScoreButton.anchor.set(0.5);
+        highScoreButton.inputEnabled = true;
+        highScoreButton.events.onInputDown.add(this.highScore);
 
         // Get levels unlocked from local storage
         levelsUnlocked = localStorage.getItem('levelsUnlocked');
@@ -49,5 +54,9 @@ Game.LevelSelect.prototype = {
 
     loadLevel: function(level) {
         game.state.start('game', true, false, level);
+    },
+
+    highScore: function() {
+        game.state.start('highScore');
     }
 }

@@ -22,7 +22,9 @@ Game.Load.prototype = {
         game.load.image('level_page', 'Assets/Level Select/page.png');
         game.load.image('level_juice_empty', 'Assets/Level Select/juice kosong.png');
         game.load.image('level_juice', 'Assets/Level Select/juice.png');
-        game.load.image('level_continue', 'Assets/Level Select/continue.png');
+        game.load.image('level_next', 'Assets/Level Select/continue.png');
+        game.load.image('level_previous', 'Assets/Level Select/previous button.png');
+        game.load.image('level_highscore', 'Assets/Level Select/high score button.png');
 
         // Game
         game.load.image('game_background', 'Assets/Game/background.png');
