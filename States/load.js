@@ -29,6 +29,7 @@ Game.Load.prototype = {
         // Game
         game.load.image('game_background', 'Assets/Game/background.png');
         game.load.image('game_blender', 'Assets/Game/blender.png');
+        game.load.spritesheet('game_blender_spritesheet', 'Assets/Game/spritesheet blender.png', 651 / 3, 616 / 2, 6);
         game.load.image('game_fruit_basket', 'Assets/Game/fruit basket.png');
         game.load.image('game_juice', 'Assets/Game/juice.png');
         game.load.image('game_time', 'Assets/Game/time.png');

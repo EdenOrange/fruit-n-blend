@@ -33,6 +33,8 @@ var gameUI;
 var pauseMenu;
 var loseScreen;
 var winScreen;
+// Blender animation reference
+var blenderAnim;
 // Win screen object reference
 var winStar1;
 var winStar2;
@@ -102,6 +104,7 @@ Game.Game.prototype = {
 
         var background = game.add.image(-1.5, 0.5, 'game_background');
         var blender = game.add.image(250, 420, 'game_blender');
+        var blenderFill = game.add.sprite(355, 410, 'game_blender_spritesheet');
         var fruitBasket = game.add.image(580, 480, 'game_fruit_basket');
         var juice = game.add.image(160, 35, 'game_juice');
         juiceText = game.add.text(150, 55, juiceCount.toString());
@@ -110,6 +113,9 @@ Game.Game.prototype = {
         var pauseButton = game.add.image(660, 50, 'game_pause');
 
         blender.anchor.set(0.5);
+
+        blenderFill.anchor.set(0.5);
+        blenderAnim = blenderFill.animations.add('blender');
 
         fruitBasket.anchor.set(0.5);
 
@@ -139,7 +145,7 @@ Game.Game.prototype = {
         timeText.strokeThickness = 5;
         timeText.align = "center";
         
-        gameUI.addMultiple([background, blender, fruitBasket, juice, juiceText, time, timeText, pauseButton]);
+        gameUI.addMultiple([background, blender, blenderFill, fruitBasket, juice, juiceText, time, timeText, pauseButton]);
         gameInputEnabledUI.push(pauseButton);
     },
 
@@ -510,6 +516,7 @@ Game.Game.prototype = {
 
         // Check if new board needs to be created
         if (boardPiecesCount == 0) {
+            this.playBlenderAnim();
             this.createBoard();
         }
 
@@ -534,6 +541,23 @@ Game.Game.prototype = {
 
         askSlot.tint = startColor;
         colorTween.start();
+    },
+
+    playBlenderAnim: function() {
+        var loopTimes = 2;
+        var loopCount;
+        blenderAnim.onStart.add(function() {
+            loopCount = 0;
+        }, this);
+        blenderAnim.onLoop.add(function() {
+            if (loopCount < loopTimes) {
+                loopCount++;
+            }
+            else {
+                blenderAnim.stop();
+            }
+        })
+        blenderAnim.play(15, true, false);
     },
 
     resetJuice: function() {
