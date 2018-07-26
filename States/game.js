@@ -315,7 +315,7 @@ Game.Game.prototype = {
             }
             for (var j = 0; j < board.settings[boardSetting].size; j++) {
                 if (boardPieces[i][j] != null) {
-                    boardPieces[i][j].destroy();
+                    this.fadeOutAndDestroy(boardPieces[i][j]);
                 }
                 boardPieces[i][j] = null;
             }
@@ -345,6 +345,7 @@ Game.Game.prototype = {
             piece.yPos = y;
             piece.anchor.set(0.5);
             piece.scale.set(board.settings[boardSetting].scale);
+            this.fadeIn(piece);
 
             boardPieces[x][y] = piece;
             boardPiecesCount++;
@@ -372,6 +373,7 @@ Game.Game.prototype = {
         askPiece.orientation = pieceSplit[3];
         askPiece.anchor.set(0.5);
         askPiece.scale.set(board.settings[boardSetting].scale);
+        this.fadeIn(askPiece);
 
         gameUI.add(askPiece);
         
@@ -387,7 +389,8 @@ Game.Game.prototype = {
             for (var j = 0; j < board.settings[boardSetting].size; j++) {
                 if (askSlots[i][j] != null) {
                     // Destroy and remove existing ask slot
-                    gameUI.remove(askSlots[i][j], true);
+                    // gameUI.removeChild(askSlots[i][j]);
+                    this.fadeOutAndDestroy(askSlots[i][j]);
                 }
                 askSlots[i][j] = null;
             }
@@ -429,6 +432,7 @@ Game.Game.prototype = {
                         askSlot.scale.set(board.settings[boardSetting].scale);
                         askSlot.inputEnabled = true;
                         askSlot.events.onInputDown.add(function(){this.checkAnswer(xCheck, yCheck)}, this);
+                        this.fadeIn(askSlot);
 
                         askSlots[xCheck][yCheck] = askSlot;
 
@@ -484,6 +488,9 @@ Game.Game.prototype = {
             {x: x+1, y: y}
         ];
 
+        // Place ask piece
+        askSlots[x][y].loadTexture("puzzle_" + askPiece.shape + '_' + askPiece.color + '_' + askPiece.orientation);
+
         // Destroy surrounding board pieces
         for (var i = 0; i < checkPos.length; i++) {
             var xCheck = checkPos[i].x;
@@ -494,7 +501,7 @@ Game.Game.prototype = {
             }
             
             if (boardPieces[xCheck][yCheck] != null) {
-                boardPieces[xCheck][yCheck].destroy();
+                this.fadeOutAndDestroy(boardPieces[xCheck][yCheck]);
                 boardPieces[xCheck][yCheck] = null;
                 boardPiecesCount--;
                 this.addJuice();
@@ -736,6 +743,20 @@ Game.Game.prototype = {
         }
         var newHighScore = JSON.stringify(highScore);
         localStorage.setItem('highScore', newHighScore);
+    },
+
+    fadeIn: function(object) {
+        object.alpha = 0;
+        var tween = game.add.tween(object).to({alpha: 1}, 500, Phaser.Easing.Linear.None, true);
+    },
+
+    fadeOutAndDestroy: function(object) {
+        object.alpha = 1;
+        object.inputEnabled = false;
+        var tween = game.add.tween(object).to({alpha: 0}, 500, Phaser.Easing.Linear.None, true);
+        tween.onComplete.add(function() {
+            object.destroy();
+        }, this);
     },
 
     freezeGame: function() {
