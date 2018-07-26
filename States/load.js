@@ -95,6 +95,16 @@ Game.Load.prototype = {
         game.load.image('result_continue', 'Assets/Game/Result/continue.png');
         game.load.image('result_restart', 'Assets/Game/Result/restart.png');
 
+        // High Score
+        game.load.image('highscore_background', 'Assets/High Score/highscore.png');
+        game.load.image('highscore_page', 'Assets/High Score/highscore page.png');
+        game.load.image('highscore_title', 'Assets/High Score/title.png');
+        game.load.image('highscore_juice', 'Assets/High Score/juice.png');
+        game.load.image('highscore_level', 'Assets/High Score/level button.png');
+        if (localStorage.getItem('highScore') == null) {
+            localStorage.setItem('highScore', JSON.stringify([]));
+        }
+
         // Filters
         game.load.script('filter_gray', 'Assets/Filters/gray.js');
     },

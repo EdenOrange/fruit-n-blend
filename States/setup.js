@@ -6,5 +6,6 @@ game.state.add('title', Game.Title);
 game.state.add('tutorial', Game.Tutorial);
 game.state.add('levelSelect', Game.LevelSelect);
 game.state.add('game', Game.Game);
+game.state.add('highScore', Game.HighScore);
 
 game.state.start('boot');
