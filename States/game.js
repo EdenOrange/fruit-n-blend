@@ -766,14 +766,15 @@ Game.Game.prototype = {
         timer.resume();
 
         this.unfreezeGame();
+
+        // Hide Pause Menu
+        pauseMenu.visible = false;
     },
 
     restart: function() {
         this.createNewGame();
         this.resume();
 
-        // Hide Pause Menu
-        pauseMenu.visible = false;
         // Hide Lose Screen
         loseScreen.visible = false;
         // Hide Win Screen
