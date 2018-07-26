@@ -270,8 +270,13 @@ Game.Game.prototype = {
         restartButton.events.onInputDown.add(this.restart, this);
 
         nextLevelButton.anchor.set(0.5);
-        nextLevelButton.inputEnabled = true;
-        nextLevelButton.events.onInputDown.add(this.nextLevel, this);
+        if (levelData.settings[level] != null) {
+            nextLevelButton.inputEnabled = true;
+            nextLevelButton.events.onInputDown.add(this.nextLevel, this);
+        }
+        else {
+            nextLevelButton.alpha = 0.5;
+        }
 
         levelButton.anchor.set(0.5);
         levelButton.inputEnabled = true;
