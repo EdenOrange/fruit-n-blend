@@ -694,11 +694,23 @@ Game.Game.prototype = {
             winStar2.visible = true;
         }
         else if (stars == 3) {
-            // Play animationf to 3 juices
+            // Play animation to 3 juices
             winStar1.visible = true;
             winStar2.visible = true;
             winStar3.visible = true;
         }
+
+        // Store highScore
+        var highScore = JSON.parse(localStorage.getItem('highScore'));
+        var date = new Date().toLocaleDateString('en-US');
+        var newScore = {"date": date, "juice": juiceCount};
+        highScore.push(newScore);
+        highScore.sort(function(a, b){return b.juice - a.juice}); // Higher juice rank higher, older date rank higher
+        if (highScore.length > 5) {
+            highScore.pop();
+        }
+        var newHighScore = JSON.stringify(highScore);
+        localStorage.setItem('highScore', newHighScore);
     },
 
     freezeGame: function() {
