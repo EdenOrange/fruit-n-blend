@@ -724,6 +724,13 @@ Game.Game.prototype = {
         gameInputEnabledUI.forEach(function (object) {
             object.inputEnabled = false;
         });
+        askSlots.forEach(function(askSlotTemp) {
+            askSlotTemp.forEach(function(askSlot) {
+                if (askSlot != null) {
+                    askSlot.inputEnabled = false;
+                }
+            })
+        });
     },
 
     unfreezeGame: function() {
@@ -735,6 +742,13 @@ Game.Game.prototype = {
         // Enable Game UI inputs
         gameInputEnabledUI.forEach(function (object) {
             object.inputEnabled = true;
+        });
+        askSlots.forEach(function(askSlotTemp) {
+            askSlotTemp.forEach(function(askSlot) {
+                if (askSlot != null) {
+                    askSlot.inputEnabled = true;
+                }
+            })
         });
     },
 
