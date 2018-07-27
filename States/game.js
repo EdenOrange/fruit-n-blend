@@ -16,7 +16,7 @@ var timeText;
 // Board settings
 var board;
 var boardSize;
-var boardSetting; // 0: size=4, 1: size=5
+var boardSetting; // 0: size=4, 1: size=5, 2: size=6
 // Board pieces holder
 var boardPieces = [];
 var boardPiecesCount;
@@ -94,6 +94,8 @@ Game.Game.prototype = {
         }
         else if (boardSize == 5) {
             boardSetting = 1;
+        } else if (boardSize == 6) {
+            boardSetting = 2;
         }
 
         juiceTarget = levelData.settings[level].juice;
