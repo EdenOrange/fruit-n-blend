@@ -80,7 +80,7 @@ Game.LevelSelect.prototype = {
                 juice.inputEnabled = true;
                 juice.events.onInputDown.add(function(){this.loadLevel(juiceLevel)}, this);
                 // Level text on juice
-                var text = game.add.text(juiceX, juiceY, juiceLevel.toString(), {font: 'bold 50px Poplar', fill: '#ffffff', stroke: '#000000', strokeThickness: 5});
+                var text = game.add.text(juiceX, juiceY, juiceLevel.toString(), {font: '50px Poplar', fill: '#ffffff', stroke: '#000000', strokeThickness: 5});
                 text.anchor.set(0.5, -0.1);
             }
             else {

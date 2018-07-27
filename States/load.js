@@ -4,6 +4,9 @@ Game.Load = function(game) {
 
 Game.Load.prototype = {
     preload: function() {
+        // Dummy text to load font
+        var dummyText = game.add.text(0, 0, "", {font: '50px Poplar'});
+
         // Loading screen
         var background = game.add.image(-3, 0, 'loading_background');
         var blender = game.add.sprite(game.world.centerX + 20, game.world.centerY - 50, 'loading_blender');
