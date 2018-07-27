@@ -73,7 +73,7 @@ Game.LevelSelect.prototype = {
             var juiceX = juiceStartX + juiceMarginX * (i % 4);
             var juiceY = juiceStartY + juiceMarginY * Math.floor(i / 4);
             var juice;
-            var juiceLevel = currentPage * juicesPerPage + i + 1;
+            let juiceLevel = currentPage * juicesPerPage + i + 1;
             if (juiceLevel - 1 < levelsUnlocked) {
                 juice = game.add.image(juiceX, juiceY, 'level_juice');
                 juice.scale.set(1.05);
