@@ -384,9 +384,9 @@ Game.Game.prototype = {
             askPiece = null;
         }
 
-        var targetPiece = this.getRandomPiece();
         var askPieceString = null;
         while (askPieceString == null) {
+            var targetPiece = this.getRandomPiece();
             askPieceString = this.generateAskPiece(targetPiece.xPos, targetPiece.yPos);
         } 
         askPiece = game.add.image(board.settings[boardSetting].ask.x, board.settings[boardSetting].ask.y, askPieceString);
@@ -909,7 +909,7 @@ Game.Game.prototype = {
     },
 
     levelSelect: function() {
-        game.state.start('levelSelect');
+        game.state.start('levelSelect', true, false, 0);
     },
 
     quit: function() {
