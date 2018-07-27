@@ -4,7 +4,15 @@ Game.Load = function(game) {
 
 Game.Load.prototype = {
     preload: function() {
-        var loadingLabel = game.add.text(80, 150, 'loading...', {font: '30px Courier', fill: '#ffffff'});
+        // Loading screen
+        var background = game.add.image(-3, 0, 'loading_background');
+        var blender = game.add.sprite(game.world.centerX + 20, game.world.centerY - 50, 'loading_blender');
+        blender.angle = -10;
+        var tween = game.add.tween(blender).to({angle: 10}, 500, Phaser.Easing.Linear.None, true, 0, -1, true);
+
+        blender.anchor.set(0.5);
+        blender.animations.add('blender');
+        blender.animations.play('blender', 6, true);
 
         // Title
         game.load.image('title_background', 'Assets/Title/background.png');
