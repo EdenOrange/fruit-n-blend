@@ -108,7 +108,8 @@ Game.Load.prototype = {
         }
 
         // Filters
-        game.load.script('filter_gray', 'Assets/Filters/gray.js');
+        game.load.script('filter_gray', 'Assets/Filters/gray.js'); // Gray filter for WEBGL
+        game.load.image('filter_black_screen', 'Assets/Game/black screen.png'); // Gray filter for CANVAS
     },
 
     create: function() {

@@ -33,6 +33,8 @@ var gameUI;
 var pauseMenu;
 var loseScreen;
 var winScreen;
+// Black screen reference for gray filter (for CANVAS renderer)
+var blackScreen;
 // Blender animation reference
 var blenderAnim;
 // Win screen object reference
@@ -111,6 +113,7 @@ Game.Game.prototype = {
         var time = game.add.image(400, 50, 'game_time');
         timeText = game.add.text(380, 55, "0:00");
         var pauseButton = game.add.image(660, 50, 'game_pause');
+        blackScreen = game.add.image(0, 0, 'filter_black_screen');
 
         blender.anchor.set(0.5);
 
@@ -126,6 +129,10 @@ Game.Game.prototype = {
         pauseButton.anchor.set(0.5);
         pauseButton.inputEnabled = true;
         pauseButton.events.onInputDown.add(this.pause, this);
+        
+        // CANVAS only
+        blackScreen.blendMode = PIXI.blendModes.SATURATION;
+        blackScreen.alpha = 0;
 
         juiceText.anchor.set(0.5);
         juiceText.font = "Poplar";
@@ -811,8 +818,7 @@ Game.Game.prototype = {
 
     freezeGame: function() {
         // Add gray filter to Game UI
-        var grayFilter = game.add.filter('Gray');
-        gameUI.filters = [grayFilter];
+        this.addGrayFilter();
         // Darken Game UI
         gameUI.setAll('tint', '0xaaaaaa');
 
@@ -831,7 +837,7 @@ Game.Game.prototype = {
 
     unfreezeGame: function() {
         // Remove gray filter from Game UI
-        gameUI.filters = null;
+        this.removeGrayFilter();
         // Lighten back up Game UI
         gameUI.setAll('tint', '0xffffff');
         
@@ -846,6 +852,25 @@ Game.Game.prototype = {
                 }
             })
         });
+    },
+
+    addGrayFilter: function() {
+        if (game.renderType == Phaser.CANVAS) {
+            blackScreen.alpha = 1;
+        }
+        else if (game.renderType == Phaser.WEBGL) {
+            var grayFilter = game.add.filter('Gray');
+            gameUI.filters = [grayFilter];
+        }
+    },
+
+    removeGrayFilter: function() {
+        if (game.renderType == Phaser.CANVAS) {
+            blackScreen.alpha = 0;
+        }
+        else if (game.renderType == Phaser.WEBGL) {
+            gameUI.filters = null;
+        }
     },
 
     pause: function() {
