@@ -748,9 +748,9 @@ Game.Game.prototype = {
     winGame: function() {
         this.freezeGame();
 
-        // Update levels unlocked
+        // Update levels unlocked if current level is the latest level, and next level exists
         var levelsUnlocked = localStorage.getItem('levelsUnlocked');
-        if (levelsUnlocked == level) {
+        if (levelsUnlocked == level && levelData.settings[level] != null) {
             localStorage.setItem('levelsUnlocked', level + 1);
         }
 

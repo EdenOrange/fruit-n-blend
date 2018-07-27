@@ -53,6 +53,6 @@ Game.HighScore.prototype = {
     },
 
     level: function() {
-        game.state.start('levelSelect');
+        game.state.start('levelSelect', true, false, 0);
     }
 }

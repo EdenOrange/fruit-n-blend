@@ -13,6 +13,6 @@ Game.Tutorial.prototype = {
     },
 
     start: function() {
-        game.state.start('levelSelect');
+        game.state.start('levelSelect', true, false, 0);
     }
 }
