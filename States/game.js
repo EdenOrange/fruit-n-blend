@@ -346,34 +346,34 @@ Game.Game.prototype = {
         boardPiecesCount = 0;
         // Create a new board
         var arrangements = board.arrangements[boardSetting][Math.floor(Math.random() * board.arrangements[boardSetting].length)];
-        for (var i = 0; i < arrangements.length; i++) {
-            var x = arrangements[i].x;
-            var y = arrangements[i].y;
-            var boardX = board.settings[boardSetting].start.x + board.settings[boardSetting].margin.x * x;
-            var boardY = board.settings[boardSetting].start.y + board.settings[boardSetting].margin.y * y;
-            var piece;
-            if ((x + y) % 2 == 0) {
-                var randomPiece = this.generateRandomPiece('h', false);
-                piece = game.add.image(boardX, boardY, randomPiece);
-            }
-            else {
-                var randomPiece = this.generateRandomPiece('v', false);
-                piece = game.add.image(boardX, boardY, randomPiece);
-            }
-            var pieceSplit = piece.key.split('_');
-            piece.shape = pieceSplit[1];
-            piece.color = pieceSplit[2];
-            piece.orientation = pieceSplit[3];
-            piece.xPos = x;
-            piece.yPos = y;
-            piece.anchor.set(0.5);
-            piece.scale.set(board.settings[boardSetting].scale);
-            this.fadeIn(piece);
+        for (let y = 0; y < arrangements.length; y++) {
+            for (let x = 0; x < arrangements[y].length; x++) {
+                // 'x' will be filled with pieces, '-' are empty
+                if (arrangements[y][x] == '-') {
+                    continue;
+                }
 
-            boardPieces[x][y] = piece;
-            boardPiecesCount++;
+                let boardX = board.settings[boardSetting].start.x + board.settings[boardSetting].margin.x * x;
+                let boardY = board.settings[boardSetting].start.y + board.settings[boardSetting].margin.y * y;
+                
+                let randomPiece = this.generateRandomPiece((x + y) % 2 == 0 ? 'h' : 'v', false);
+                let piece = game.add.image(boardX, boardY, randomPiece);
 
-            gameUI.add(piece);
+                let pieceSplit = piece.key.split('_');
+                piece.shape = pieceSplit[1];
+                piece.color = pieceSplit[2];
+                piece.orientation = pieceSplit[3];
+                piece.xPos = x;
+                piece.yPos = y;
+                piece.anchor.set(0.5);
+                piece.scale.set(board.settings[boardSetting].scale);
+                this.fadeIn(piece);
+
+                boardPieces[x][y] = piece;
+                boardPiecesCount++;
+
+                gameUI.add(piece);
+            }
         }
     },
 
